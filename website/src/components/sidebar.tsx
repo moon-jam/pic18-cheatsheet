@@ -5,7 +5,7 @@ import {
   LuTableProperties,
 } from "@qwikest/icons/lucide";
 
-import pack from "../../../data/pack.json";
+import pack from "../../../data/reference.json";
 import Button from "./ui/button";
 import { Accordion } from "./ui/accordion";
 
@@ -41,7 +41,7 @@ export default component$(
           checked
         />
         <Button
-          htmlFor="sidebar-toggle"
+          for="sidebar-toggle"
           class="p-3 absolute top-5 left-3 bg-chat-bg peer-checked:hidden cursor-pointer"
         >
           <LuArrowRight class="w-6 h-6" />
@@ -50,11 +50,11 @@ export default component$(
           class={`bg-sidebar-bg border-outline border-r p-5 flex flex-col transition-all peer-not-checked:-ml-[100vw] w-screen md:peer-not-checked:-ml-[310px] md:w-[310px] ${props["class"]}`}
         >
           <div class="flex items-center justify-between text-lg font-semibold border-b border-outline pb-1 mb-2 items-center">
-            <div>
-              <LuTableProperties className="w-6 h-6 mx-1 inline-block" />
+            <a href="../" class="hover:text-primary">
+              <LuTableProperties class="w-6 h-6 mx-1 inline-block" />
               PIC18 cheatsheet
-            </div>
-            <Button htmlFor="sidebar-toggle" class="p-3 cursor-pointer">
+            </a>
+            <Button for="sidebar-toggle" class="p-3 cursor-pointer">
               <LuArrowLeft class="w-6 h-6" />
             </Button>
           </div>

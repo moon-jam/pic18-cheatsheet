@@ -4,6 +4,7 @@ export default component$(
   (
     props: HTMLAttributes<HTMLLabelElement> & {
       class?: string;
+      for?: string;
     },
   ) => {
     return (
