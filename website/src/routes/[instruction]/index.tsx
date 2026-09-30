@@ -4,10 +4,25 @@ import type {
   StaticGenerateHandler,
 } from "@builder.io/qwik-city";
 import { routeLoader$ } from "@builder.io/qwik-city";
-import pack from "../../../../data/pack.json";
+import pack from "../../../../data/reference.json";
 import Sidebar from "~/components/sidebar";
-import { marked } from "marked";
 import { codeToHtml } from "shiki";
+
+function example(name: string, syntax: string): string {
+  if (name === "ADDLW") return "MOVLW 0x10\nADDLW 0x15 ; WREG = 0x25";
+  if (name === "MOVFF") return "MOVFF 0x020, 0x021";
+  if (name === "LFSR") return "LFSR 0, 0x123";
+  if (name === "MOVLB") return "MOVLB 0x05";
+  if (name === "CALL") return "CALL 0x0100, 0";
+  if (name === "GOTO") return "GOTO 0x0100";
+  if (name === "RETURN" || name === "RETFIE") return `${name} 0`;
+  if (/^(BC|BN|BNC|BNN|BNOV|BNZ|BOV|BRA|BZ|RCALL)$/.test(name)) return `${name} target\ntarget: NOP`;
+  if (/ f, b/.test(syntax)) return `${name} 0x20, 3, 0`;
+  if (/ f \{,d/.test(syntax)) return `${name} 0x20, 0, 0`;
+  if (/ f \{,a/.test(syntax)) return `${name} 0x20, 0`;
+  if (/ k/.test(syntax)) return `${name} 0x15`;
+  return name;
+}
 
 export const useInstruction = routeLoader$(({ params }) => {
   const instr = pack.find((i) => i.name.toLowerCase() === params.instruction);
@@ -49,37 +64,42 @@ export default component$(() => {
         selectedEntry={instr.value.name}
       />
       <div class="min-w-0 grow-1 h-full bg-chat-bg flex justify-center">
-        <div class="p-8 max-w-4xl bg-primary-50 h-screen flex flex-col overflow-y-auto nobar">
+        <div class="p-8 w-full max-w-5xl bg-primary-50 h-screen flex flex-col overflow-y-auto nobar">
           <h1 class="text-4xl font-bold mb-8 text-center text-primary-800">
             {instr.value.name}
           </h1>
-          <p class="text-lg mb-8 text-center text-primary-700">
-            Detailed reference for the {instr.value.name} instruction in PIC18
-            ISA.
-          </p>
+          <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-primary-800">
+              Instruction
+            </h2>
+            <table class="w-full text-primary-700 text-lg border-collapse">
+              <tbody>
+                <tr class="border-b border-outline"><th scope="row" class="w-40 text-left p-2 align-top">Syntax</th><td class="p-2 font-mono">{instr.value.syntax}</td></tr>
+                <tr class="border-b border-outline"><th scope="row" class="text-left p-2 align-top">Operands</th><td class="p-2">{instr.value.operands}</td></tr>
+                <tr class="border-b border-outline"><th scope="row" class="text-left p-2 align-top">Operation</th><td class="p-2">{instr.value.operation}</td></tr>
+                <tr class="border-b border-outline"><th scope="row" class="text-left p-2 align-top">Status affected</th><td class="p-2">{instr.value.status}</td></tr>
+                <tr class="border-b border-outline"><th scope="row" class="text-left p-2 align-top">Encoding</th><td class="p-2 font-mono break-all">{instr.value.encoding}</td></tr>
+                <tr><th scope="row" class="text-left p-2 align-top">Words / cycles</th><td class="p-2">{instr.value.words} / {instr.value.cycles}</td></tr>
+              </tbody>
+            </table>
+          </section>
 
           <section class="mb-8">
             <h2 class="text-2xl font-semibold mb-4 text-primary-800">
               Description
             </h2>
-            <div
-              class="text-primary-700 mb-4 text-lg"
-              dangerouslySetInnerHTML={
-                marked.parse(instr.value.description) as string
-              }
-            ></div>
+            <p class="text-primary-700 text-lg">{instr.value.description}</p>
           </section>
 
           <section class="mb-8">
             <h2 class="text-2xl font-semibold mb-4 text-primary-800">
-              Examples
+              Example
             </h2>
-            {instr.value.examples.map((ex: string, idx: number) => (
-              <Code code={ex} key={idx} />
-            ))}
+            <Code code={example(instr.value.name, instr.value.syntax)} />
           </section>
 
           <footer class="text-center text-primary-600 mt-auto">
+            <p><a href={`https://ww1.microchip.com/downloads/en/DeviceDoc/39631E.pdf#page=${instr.value.page + 2}`} target="_blank" rel="noopener noreferrer" class="underline">Microchip DS39631E, p. {instr.value.page}</a></p>
             <p>
               Back to{" "}
               <a href=".." class="underline">
