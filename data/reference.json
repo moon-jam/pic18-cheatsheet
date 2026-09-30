@@ -11,7 +11,8 @@
     "page": 273,
     "category": "Byte-oriented File Register Operations",
     "short": "Add WREG to f",
-    "description": "Adds WREG to the byte in f. d selects whether the result is written to WREG (0) or f (1)."
+    "description": "Adds WREG to the byte in f. d selects whether the result is written to WREG (0) or f (1).",
+    "example": "MOVLW 0x05\nMOVWF 0x20, 0        ; f[0x20] = 0x05 (Access Bank)\nMOVLW 0x03           ; WREG = 0x03\nADDWF 0x20, 0, 0     ; d=0: WREG = 0x08; f stays 0x05\nADDWF 0x20, 1, 0     ; d=1: f = 0x0D; WREG stays 0x08"
   },
   {
     "name": "ADDWFC",
@@ -25,7 +26,8 @@
     "page": 274,
     "category": "Byte-oriented File Register Operations",
     "short": "Add WREG and Carry bit to f",
-    "description": "Adds WREG, the byte in f, and the current Carry bit. d selects whether the result is written to WREG (0) or f (1)."
+    "description": "Adds WREG, the byte in f, and the current Carry bit. d selects whether the result is written to WREG (0) or f (1).",
+    "example": "MOVLW 0x05\nMOVWF 0x20, 0        ; f = 0x05\nMOVLW 0x03           ; WREG = 0x03\nBSF STATUS, 0, 0     ; Carry = 1\nADDWFC 0x20, 0, 0    ; WREG = 0x05 + 0x03 + 1 = 0x09"
   },
   {
     "name": "ANDWF",
@@ -39,7 +41,8 @@
     "page": 275,
     "category": "Byte-oriented File Register Operations",
     "short": "AND WREG with f",
-    "description": "Applies bitwise AND to WREG and the byte in f. d selects where the result is written."
+    "description": "Applies bitwise AND to WREG and the byte in f. d selects where the result is written.",
+    "example": "MOVLW 0x0F\nMOVWF 0x20, 0        ; f = 00001111b\nMOVLW 0x33           ; WREG = 00110011b\nANDWF 0x20, 1, 0     ; f = 00000011b = 0x03; d=1 writes to f"
   },
   {
     "name": "CLRF",
@@ -53,7 +56,8 @@
     "page": 283,
     "category": "Byte-oriented File Register Operations",
     "short": "Clear f",
-    "description": "Writes zero to f and sets the Zero flag."
+    "description": "Writes zero to f and sets the Zero flag.",
+    "example": "MOVLW 0x55\nMOVWF 0x20, 0        ; f = 0x55\nCLRF 0x20, 0         ; f = 0x00; Zero (Z) = 1"
   },
   {
     "name": "COMF",
@@ -67,7 +71,8 @@
     "page": 284,
     "category": "Byte-oriented File Register Operations",
     "short": "Complement f",
-    "description": "Inverts every bit of the byte in f. d selects whether the result is written to WREG (0) or f (1)."
+    "description": "Inverts every bit of the byte in f. d selects whether the result is written to WREG (0) or f (1).",
+    "example": "MOVLW 0x0F\nMOVWF 0x20, 0        ; f = 00001111b\nCOMF 0x20, 0, 0      ; WREG = 11110000b = 0xF0; f stays 0x0F"
   },
   {
     "name": "CPFSEQ",
@@ -81,7 +86,8 @@
     "page": 284,
     "category": "Byte-oriented File Register Operations",
     "short": "Compare f with WREG, skip =",
-    "description": "Compares f with WREG as unsigned bytes. If they are equal, the next instruction is skipped; status flags are unchanged."
+    "description": "Compares f with WREG as unsigned bytes. If they are equal, the next instruction is skipped; status flags are unchanged.",
+    "example": "MOVLW 0x05\nMOVWF 0x20, 0        ; f = 0x05\nCPFSEQ 0x20, 0       ; f == WREG, so skip the next instruction\nNOP                  ; skipped; status flags do not change"
   },
   {
     "name": "CPFSGT",
@@ -95,7 +101,8 @@
     "page": 285,
     "category": "Byte-oriented File Register Operations",
     "short": "Compare f with WREG, skip if >",
-    "description": "Compares f with WREG as unsigned bytes. If f is greater than WREG, the next instruction is skipped; status flags are unchanged."
+    "description": "Compares f with WREG as unsigned bytes. If f is greater than WREG, the next instruction is skipped; status flags are unchanged.",
+    "example": "MOVLW 0x07\nMOVWF 0x20, 0        ; f = 7\nMOVLW 0x05           ; WREG = 5\nCPFSGT 0x20, 0       ; f > WREG (7 > 5), so skip\nNOP                  ; skipped; status flags do not change"
   },
   {
     "name": "CPFSLT",
@@ -109,7 +116,8 @@
     "page": 285,
     "category": "Byte-oriented File Register Operations",
     "short": "Compare f with WREG, skip if <",
-    "description": "Compares f with WREG as unsigned bytes. If f is less than WREG, the next instruction is skipped; status flags are unchanged."
+    "description": "Compares f with WREG as unsigned bytes. If f is less than WREG, the next instruction is skipped; status flags are unchanged.",
+    "example": "MOVLW 0x03\nMOVWF 0x20, 0        ; f = 3\nMOVLW 0x05           ; WREG = 5\nCPFSLT 0x20, 0       ; f < WREG (3 < 5), so skip\nNOP                  ; skipped; status flags do not change"
   },
   {
     "name": "DECF",
@@ -123,7 +131,8 @@
     "page": 286,
     "category": "Byte-oriented File Register Operations",
     "short": "Decrement f",
-    "description": "Subtracts one from the byte in f. d selects whether the result is written to WREG (0) or f (1)."
+    "description": "Subtracts one from the byte in f. d selects whether the result is written to WREG (0) or f (1).",
+    "example": "MOVLW 0x10\nMOVWF 0x20, 0        ; f = 0x10\nDECF 0x20, 1, 0      ; f = 0x0F; d=1 writes back to f"
   },
   {
     "name": "DECFSZ",
@@ -137,7 +146,8 @@
     "page": 287,
     "category": "Byte-oriented File Register Operations",
     "short": "Decrement f, Skip if 0",
-    "description": "Subtracts one from f and writes the result to WREG (d = 0) or f (d = 1). If the result is zero, the next instruction is skipped; status flags are unchanged."
+    "description": "Subtracts one from f and writes the result to WREG (d = 0) or f (d = 1). If the result is zero, the next instruction is skipped; status flags are unchanged.",
+    "example": "MOVLW 0x01\nMOVWF 0x20, 0        ; f = 1\nDECFSZ 0x20, 1, 0    ; f = 0, so skip; status flags unchanged\nNOP                  ; skipped"
   },
   {
     "name": "DCFSNZ",
@@ -151,7 +161,8 @@
     "page": 287,
     "category": "Byte-oriented File Register Operations",
     "short": "Decrement f, Skip if Not 0",
-    "description": "Subtracts one from f and writes the result to WREG (d = 0) or f (d = 1). If the result is not zero, the next instruction is skipped; status flags are unchanged."
+    "description": "Subtracts one from f and writes the result to WREG (d = 0) or f (d = 1). If the result is not zero, the next instruction is skipped; status flags are unchanged.",
+    "example": "MOVLW 0x02\nMOVWF 0x20, 0        ; f = 2\nDCFSNZ 0x20, 1, 0    ; f = 1 (not zero), so skip\nNOP                  ; skipped; status flags unchanged"
   },
   {
     "name": "INCF",
@@ -165,7 +176,8 @@
     "page": 288,
     "category": "Byte-oriented File Register Operations",
     "short": "Increment f",
-    "description": "Adds one to the byte in f. d selects whether the result is written to WREG (0) or f (1)."
+    "description": "Adds one to the byte in f. d selects whether the result is written to WREG (0) or f (1).",
+    "example": "MOVLW 0x0F\nMOVWF 0x20, 0        ; f = 0x0F\nINCF 0x20, 1, 0      ; f = 0x10; d=1 writes back to f"
   },
   {
     "name": "INCFSZ",
@@ -179,7 +191,8 @@
     "page": 289,
     "category": "Byte-oriented File Register Operations",
     "short": "Increment f, Skip if 0",
-    "description": "Adds one to f and writes the result to WREG (d = 0) or f (d = 1). If the result is zero, the next instruction is skipped; status flags are unchanged."
+    "description": "Adds one to f and writes the result to WREG (d = 0) or f (d = 1). If the result is zero, the next instruction is skipped; status flags are unchanged.",
+    "example": "MOVLW 0xFF\nMOVWF 0x20, 0        ; f = 0xFF\nINCFSZ 0x20, 1, 0    ; f wraps to 0x00, so skip\nNOP                  ; skipped; status flags unchanged"
   },
   {
     "name": "INFSNZ",
@@ -193,7 +206,8 @@
     "page": 289,
     "category": "Byte-oriented File Register Operations",
     "short": "Increment f, Skip if Not 0",
-    "description": "Adds one to f and writes the result to WREG (d = 0) or f (d = 1). If the result is not zero, the next instruction is skipped; status flags are unchanged."
+    "description": "Adds one to f and writes the result to WREG (d = 0) or f (d = 1). If the result is not zero, the next instruction is skipped; status flags are unchanged.",
+    "example": "CLRF 0x20, 0         ; f = 0\nINFSNZ 0x20, 1, 0    ; f = 1 (not zero), so skip\nNOP                  ; skipped; status flags unchanged"
   },
   {
     "name": "IORWF",
@@ -207,7 +221,8 @@
     "page": 290,
     "category": "Byte-oriented File Register Operations",
     "short": "Inclusive OR WREG with f",
-    "description": "Applies bitwise inclusive OR to WREG and the byte in f. d selects where the result is written."
+    "description": "Applies bitwise inclusive OR to WREG and the byte in f. d selects where the result is written.",
+    "example": "MOVLW 0x0C\nMOVWF 0x20, 0        ; f = 00001100b\nMOVLW 0x03           ; WREG = 00000011b\nIORWF 0x20, 1, 0     ; f = 00001111b = 0x0F"
   },
   {
     "name": "MOVF",
@@ -221,7 +236,8 @@
     "page": 291,
     "category": "Byte-oriented File Register Operations",
     "short": "Move f",
-    "description": "Copies the byte in f to WREG (d = 0) or writes it back to f (d = 1). The value is unchanged, but the Zero and Negative flags are updated."
+    "description": "Copies the byte in f to WREG (d = 0) or writes it back to f (d = 1). The value is unchanged, but the Zero and Negative flags are updated.",
+    "example": "MOVLW 0x2A\nMOVWF 0x20, 0        ; f = 0x2A\nMOVLW 0x00           ; WREG = 0 before the copy\nMOVF 0x20, 0, 0      ; d=0: WREG = 0x2A; Z=0, N=0"
   },
   {
     "name": "MOVFF",
@@ -235,7 +251,8 @@
     "page": 292,
     "category": "Byte-oriented File Register Operations",
     "short": "Move fs (source) to fd (destination)",
-    "description": "Copies one byte from the full source file address fs to the full destination file address fd. The Bank Select Register is not needed for either address."
+    "description": "Copies one byte from the full source file address fs to the full destination file address fd. The Bank Select Register is not needed for either address.",
+    "example": "MOVLW 0x5A\nMOVWF 0x20, 0        ; source [0x020] = 0x5A\nMOVFF 0x020, 0x121   ; destination [0x121] = 0x5A\n                     ; both addresses are full 12-bit addresses"
   },
   {
     "name": "MOVWF",
@@ -249,7 +266,8 @@
     "page": 293,
     "category": "Byte-oriented File Register Operations",
     "short": "Move WREG to f",
-    "description": "Copies the current WREG value into f. WREG itself is unchanged."
+    "description": "Copies the current WREG value into f. WREG itself is unchanged.",
+    "example": "MOVLW 0x5A           ; WREG = 0x5A\nMOVWF 0x20, 0        ; f[0x20] = 0x5A; WREG stays 0x5A"
   },
   {
     "name": "MULWF",
@@ -263,7 +281,8 @@
     "page": 294,
     "category": "Byte-oriented File Register Operations",
     "short": "Multiply WREG with f",
-    "description": "Multiplies the unsigned bytes in WREG and f. The 16-bit product is stored in PRODH:PRODL."
+    "description": "Multiplies the unsigned bytes in WREG and f. The 16-bit product is stored in PRODH:PRODL.",
+    "example": "MOVLW 0x80\nMOVWF 0x20, 0        ; f = 0x80\nMOVLW 0x02           ; WREG = 0x02\nMULWF 0x20, 0        ; 0x02 * 0x80 = 0x0100\n                     ; PRODH = 0x01, PRODL = 0x00"
   },
   {
     "name": "NEGF",
@@ -277,7 +296,8 @@
     "page": 295,
     "category": "Byte-oriented File Register Operations",
     "short": "Negate f",
-    "description": "Replaces the byte in f with its two’s complement, equivalent to subtracting it from zero."
+    "description": "Replaces the byte in f with its two’s complement, equivalent to subtracting it from zero.",
+    "example": "MOVLW 0x05\nMOVWF 0x20, 0        ; f = 0x05\nNEGF 0x20, 0         ; f = -5 modulo 256 = 0xFB"
   },
   {
     "name": "RLCF",
@@ -291,7 +311,8 @@
     "page": 299,
     "category": "Byte-oriented File Register Operations",
     "short": "Rotate Left f through Carry",
-    "description": "Rotates the byte in f left through Carry. Its highest bit becomes the new Carry bit; the old Carry bit becomes the lowest bit of the result."
+    "description": "Rotates the byte in f left through Carry. Its highest bit becomes the new Carry bit; the old Carry bit becomes the lowest bit of the result.",
+    "example": "MOVLW 0x80\nMOVWF 0x20, 0        ; f = 10000000b\nBSF STATUS, 0, 0     ; old Carry = 1\nRLCF 0x20, 1, 0      ; f = 00000001b; new Carry = old bit 7 = 1"
   },
   {
     "name": "RLNCF",
@@ -305,7 +326,8 @@
     "page": 300,
     "category": "Byte-oriented File Register Operations",
     "short": "Rotate Left f (No Carry)",
-    "description": "Rotates the byte in f left by one bit. Its highest bit wraps into the lowest bit; Carry is unchanged."
+    "description": "Rotates the byte in f left by one bit. Its highest bit wraps into the lowest bit; Carry is unchanged.",
+    "example": "MOVLW 0x81\nMOVWF 0x20, 0        ; f = 10000001b\nRLNCF 0x20, 1, 0     ; f = 00000011b; bit 7 wraps to bit 0\n                     ; Carry is unchanged"
   },
   {
     "name": "RRCF",
@@ -319,7 +341,8 @@
     "page": 300,
     "category": "Byte-oriented File Register Operations",
     "short": "Rotate Right f through Carry",
-    "description": "Rotates the byte in f right through Carry. Its lowest bit becomes the new Carry bit; the old Carry bit becomes the highest bit of the result."
+    "description": "Rotates the byte in f right through Carry. Its lowest bit becomes the new Carry bit; the old Carry bit becomes the highest bit of the result.",
+    "example": "MOVLW 0x01\nMOVWF 0x20, 0        ; f = 00000001b\nBSF STATUS, 0, 0     ; old Carry = 1\nRRCF 0x20, 1, 0      ; f = 10000000b; new Carry = old bit 0 = 1"
   },
   {
     "name": "RRNCF",
@@ -333,7 +356,8 @@
     "page": 301,
     "category": "Byte-oriented File Register Operations",
     "short": "Rotate Right f (No Carry)",
-    "description": "Rotates the byte in f right by one bit. Its lowest bit wraps into the highest bit; Carry is unchanged."
+    "description": "Rotates the byte in f right by one bit. Its lowest bit wraps into the highest bit; Carry is unchanged.",
+    "example": "MOVLW 0x81\nMOVWF 0x20, 0        ; f = 10000001b\nRRNCF 0x20, 1, 0     ; f = 11000000b; bit 0 wraps to bit 7\n                     ; Carry is unchanged"
   },
   {
     "name": "SETF",
@@ -347,7 +371,8 @@
     "page": 301,
     "category": "Byte-oriented File Register Operations",
     "short": "Set f",
-    "description": "Writes FFh to f. No status flags are changed."
+    "description": "Writes FFh to f. No status flags are changed.",
+    "example": "CLRF 0x20, 0         ; f = 0x00\nSETF 0x20, 0         ; f = 0xFF; status flags unchanged"
   },
   {
     "name": "SUBFWB",
@@ -361,7 +386,8 @@
     "page": 302,
     "category": "Byte-oriented File Register Operations",
     "short": "Subtract f from WREG with borrow",
-    "description": "Subtracts f and the borrow from WREG. A cleared Carry bit represents a borrow; d selects where the result is written."
+    "description": "Subtracts f and the borrow from WREG. A cleared Carry bit represents a borrow; d selects where the result is written.",
+    "example": "MOVLW 0x03\nMOVWF 0x20, 0        ; f = 3\nMOVLW 0x09           ; WREG = 9\nBCF STATUS, 0, 0     ; C=0 means borrow=1\nSUBFWB 0x20, 0, 0    ; WREG = 9 - 3 - 1 = 5"
   },
   {
     "name": "SUBWF",
@@ -375,7 +401,8 @@
     "page": 303,
     "category": "Byte-oriented File Register Operations",
     "short": "Subtract WREG from f",
-    "description": "Subtracts WREG from f. d selects whether the result is written to WREG (0) or f (1)."
+    "description": "Subtracts WREG from f. d selects whether the result is written to WREG (0) or f (1).",
+    "example": "MOVLW 0x09\nMOVWF 0x20, 0        ; f = 9\nMOVLW 0x03           ; WREG = 3\nSUBWF 0x20, 1, 0     ; f = 9 - 3 = 6"
   },
   {
     "name": "SUBWFB",
@@ -389,7 +416,8 @@
     "page": 304,
     "category": "Byte-oriented File Register Operations",
     "short": "Subtract WREG from f with borrow",
-    "description": "Subtracts WREG and the borrow from f. A cleared Carry bit represents a borrow; d selects where the result is written."
+    "description": "Subtracts WREG and the borrow from f. A cleared Carry bit represents a borrow; d selects where the result is written.",
+    "example": "MOVLW 0x09\nMOVWF 0x20, 0        ; f = 9\nMOVLW 0x03           ; WREG = 3\nBCF STATUS, 0, 0     ; C=0 means borrow=1\nSUBWFB 0x20, 1, 0    ; f = 9 - 3 - 1 = 5"
   },
   {
     "name": "SWAPF",
@@ -403,7 +431,8 @@
     "page": 304,
     "category": "Byte-oriented File Register Operations",
     "short": "Swap nibbles in f",
-    "description": "Exchanges the upper and lower four bits of f. d selects whether the result is written to WREG (0) or f (1)."
+    "description": "Exchanges the upper and lower four bits of f. d selects whether the result is written to WREG (0) or f (1).",
+    "example": "MOVLW 0xA5\nMOVWF 0x20, 0        ; f = A5h (upper A, lower 5)\nSWAPF 0x20, 1, 0     ; f = 5Ah (upper 5, lower A)"
   },
   {
     "name": "TSTFSZ",
@@ -417,7 +446,8 @@
     "page": 307,
     "category": "Byte-oriented File Register Operations",
     "short": "Test f, skip if 0",
-    "description": "Tests whether f contains zero. If it does, the next instruction is skipped; f and status flags are unchanged."
+    "description": "Tests whether f contains zero. If it does, the next instruction is skipped; f and status flags are unchanged.",
+    "example": "CLRF 0x20, 0         ; f = 0\nTSTFSZ 0x20, 0      ; f is zero, so skip\nNOP                  ; skipped; f and status flags unchanged"
   },
   {
     "name": "XORWF",
@@ -431,7 +461,8 @@
     "page": 308,
     "category": "Byte-oriented File Register Operations",
     "short": "Exclusive OR WREG with f",
-    "description": "Applies bitwise exclusive OR to WREG and the byte in f. d selects where the result is written."
+    "description": "Applies bitwise exclusive OR to WREG and the byte in f. d selects where the result is written.",
+    "example": "MOVLW 0x0F\nMOVWF 0x20, 0        ; f = 00001111b\nMOVLW 0x33           ; WREG = 00110011b\nXORWF 0x20, 1, 0     ; f = 00111100b = 0x3C"
   },
   {
     "name": "BCF",
@@ -445,7 +476,8 @@
     "page": 276,
     "category": "Bit-oriented File Register Operations",
     "short": "Bit Clear f",
-    "description": "Clears bit b of f to zero. Other bits and status flags are unchanged."
+    "description": "Clears bit b of f to zero. Other bits and status flags are unchanged.",
+    "example": "MOVLW 0x0F\nMOVWF 0x20, 0        ; f = 00001111b\nBCF 0x20, 3, 0       ; clear bit 3: f = 00000111b"
   },
   {
     "name": "BSF",
@@ -459,7 +491,8 @@
     "page": 279,
     "category": "Bit-oriented File Register Operations",
     "short": "Bit Set f",
-    "description": "Sets bit b of f to one. Other bits and status flags are unchanged."
+    "description": "Sets bit b of f to one. Other bits and status flags are unchanged.",
+    "example": "CLRF 0x20, 0         ; f = 00000000b\nBSF 0x20, 3, 0       ; set bit 3: f = 00001000b"
   },
   {
     "name": "BTFSC",
@@ -473,7 +506,8 @@
     "page": 280,
     "category": "Bit-oriented File Register Operations",
     "short": "Bit Test f, Skip if Clear",
-    "description": "Tests bit b of f. If that bit is clear (0), the next instruction is skipped; status flags are unchanged."
+    "description": "Tests bit b of f. If that bit is clear (0), the next instruction is skipped; status flags are unchanged.",
+    "example": "MOVLW 0x04\nMOVWF 0x20, 0        ; f = 00000100b; bit 3 is clear\nBTFSC 0x20, 3, 0     ; bit 3 = 0, so skip the next instruction\nGOTO elsewhere       ; skipped as one 2-word instruction\nMOVLW 0x01           ; executed; skip costs 3 cycles here\nelsewhere:\nNOP"
   },
   {
     "name": "BTFSS",
@@ -487,7 +521,8 @@
     "page": 280,
     "category": "Bit-oriented File Register Operations",
     "short": "Bit Test f, Skip if Set",
-    "description": "Tests bit b of f. If that bit is set (1), the next instruction is skipped; status flags are unchanged."
+    "description": "Tests bit b of f. If that bit is set (1), the next instruction is skipped; status flags are unchanged.",
+    "example": "MOVLW 0x08\nMOVWF 0x20, 0        ; f = 00001000b; bit 3 is set\nBTFSS 0x20, 3, 0     ; bit 3 = 1, so skip\nNOP                  ; skipped"
   },
   {
     "name": "BTG",
@@ -501,7 +536,8 @@
     "page": 281,
     "category": "Bit-oriented File Register Operations",
     "short": "Bit Toggle f",
-    "description": "Toggles bit b of f: zero becomes one and one becomes zero. Other bits and status flags are unchanged."
+    "description": "Toggles bit b of f: zero becomes one and one becomes zero. Other bits and status flags are unchanged.",
+    "example": "MOVLW 0x08\nMOVWF 0x20, 0        ; f = 00001000b\nBTG 0x20, 3, 0       ; bit 3: 1 -> 0; f = 0x00\nBTG 0x20, 3, 0       ; bit 3: 0 -> 1; f = 0x08"
   },
   {
     "name": "BC",
@@ -515,7 +551,8 @@
     "page": 275,
     "category": "Control Operations",
     "short": "Branch if Carry",
-    "description": "If Carry is set, branches by the signed offset n relative to the instruction after BC. Otherwise, execution continues with that next instruction."
+    "description": "If Carry is set, branches by the signed offset n relative to the instruction after BC. Otherwise, execution continues with that next instruction.",
+    "example": "; Given Carry (C) = 1\nBC bc_target       ; n = +1: jump over one NOP\nNOP                  ; runs only when Carry (C) = 0\nbc_target:\nNOP                  ; execution resumes here"
   },
   {
     "name": "BN",
@@ -529,7 +566,8 @@
     "page": 276,
     "category": "Control Operations",
     "short": "Branch if Negative",
-    "description": "If Negative is set, branches by the signed offset n relative to the instruction after BN. Otherwise, execution continues with that next instruction."
+    "description": "If Negative is set, branches by the signed offset n relative to the instruction after BN. Otherwise, execution continues with that next instruction.",
+    "example": "; Given Negative (N) = 1\nBN bn_target       ; n = +1: jump over one NOP\nNOP                  ; runs only when Negative (N) = 0\nbn_target:\nNOP                  ; execution resumes here"
   },
   {
     "name": "BNC",
@@ -543,7 +581,8 @@
     "page": 277,
     "category": "Control Operations",
     "short": "Branch if Not Carry",
-    "description": "If Carry is clear, branches by the signed offset n relative to the instruction after BNC. Otherwise, execution continues with that next instruction."
+    "description": "If Carry is clear, branches by the signed offset n relative to the instruction after BNC. Otherwise, execution continues with that next instruction.",
+    "example": "; Given Carry (C) = 0\nBNC bnc_target       ; n = +1: jump over one NOP\nNOP                  ; runs only when Carry (C) = 1\nbnc_target:\nNOP                  ; execution resumes here"
   },
   {
     "name": "BNN",
@@ -557,7 +596,8 @@
     "page": 277,
     "category": "Control Operations",
     "short": "Branch if Not Negative",
-    "description": "If Negative is clear, branches by the signed offset n relative to the instruction after BNN. Otherwise, execution continues with that next instruction."
+    "description": "If Negative is clear, branches by the signed offset n relative to the instruction after BNN. Otherwise, execution continues with that next instruction.",
+    "example": "; Given Negative (N) = 0\nBNN bnn_target       ; n = +1: jump over one NOP\nNOP                  ; runs only when Negative (N) = 1\nbnn_target:\nNOP                  ; execution resumes here"
   },
   {
     "name": "BNOV",
@@ -571,7 +611,8 @@
     "page": 278,
     "category": "Control Operations",
     "short": "Branch if Not Overflow",
-    "description": "If Overflow is clear, branches by the signed offset n relative to the instruction after BNOV. Otherwise, execution continues with that next instruction."
+    "description": "If Overflow is clear, branches by the signed offset n relative to the instruction after BNOV. Otherwise, execution continues with that next instruction.",
+    "example": "; Given Overflow (OV) = 0\nBNOV bnov_target       ; n = +1: jump over one NOP\nNOP                  ; runs only when Overflow (OV) = 1\nbnov_target:\nNOP                  ; execution resumes here"
   },
   {
     "name": "BNZ",
@@ -585,7 +626,8 @@
     "page": 278,
     "category": "Control Operations",
     "short": "Branch if Not Zero",
-    "description": "If Zero is clear, branches by the signed offset n relative to the instruction after BNZ. Otherwise, execution continues with that next instruction."
+    "description": "If Zero is clear, branches by the signed offset n relative to the instruction after BNZ. Otherwise, execution continues with that next instruction.",
+    "example": "; Given Zero (Z) = 0\nBNZ bnz_target       ; n = +1: jump over one NOP\nNOP                  ; runs only when Zero (Z) = 1\nbnz_target:\nNOP                  ; execution resumes here"
   },
   {
     "name": "BOV",
@@ -599,7 +641,8 @@
     "page": 281,
     "category": "Control Operations",
     "short": "Branch if Overflow",
-    "description": "If Overflow is set, branches by the signed offset n relative to the instruction after BOV. Otherwise, execution continues with that next instruction."
+    "description": "If Overflow is set, branches by the signed offset n relative to the instruction after BOV. Otherwise, execution continues with that next instruction.",
+    "example": "; Given Overflow (OV) = 1\nBOV bov_target       ; n = +1: jump over one NOP\nNOP                  ; runs only when Overflow (OV) = 0\nbov_target:\nNOP                  ; execution resumes here"
   },
   {
     "name": "BRA",
@@ -613,7 +656,8 @@
     "page": 279,
     "category": "Control Operations",
     "short": "Branch Unconditionally",
-    "description": "Always branches by the signed offset n relative to the instruction after BRA."
+    "description": "Always branches by the signed offset n relative to the instruction after BRA.",
+    "example": "BRA target           ; n = +1: jump over one NOP\nNOP                  ; skipped by the branch\ntarget:\nNOP                  ; execution continues here"
   },
   {
     "name": "BZ",
@@ -627,7 +671,8 @@
     "page": 282,
     "category": "Control Operations",
     "short": "Branch if Zero",
-    "description": "If Zero is set, branches by the signed offset n relative to the instruction after BZ. Otherwise, execution continues with that next instruction."
+    "description": "If Zero is set, branches by the signed offset n relative to the instruction after BZ. Otherwise, execution continues with that next instruction.",
+    "example": "; Given Zero (Z) = 1\nBZ bz_target       ; n = +1: jump over one NOP\nNOP                  ; runs only when Zero (Z) = 0\nbz_target:\nNOP                  ; execution resumes here"
   },
   {
     "name": "CALL",
@@ -641,7 +686,8 @@
     "page": 282,
     "category": "Control Operations",
     "short": "Call subroutine",
-    "description": "Pushes the return address onto the return stack and jumps to address k. With s = 1, WREG, STATUS, and BSR are also copied to their shadow registers for a fast return."
+    "description": "Pushes the return address onto the return stack and jumps to address k. With s = 1, WREG, STATUS, and BSR are also copied to their shadow registers for a fast return.",
+    "example": "MOVLW 0x05           ; WREG = 5\nCALL add_one, 0      ; push return address; jump to add_one\n                     ; WREG = 6 when execution returns\nGOTO done            ; do not fall through into subroutine\nadd_one:\nADDLW 0x01           ; WREG = 6\nRETURN 0             ; pop return address\ndone:\nNOP"
   },
   {
     "name": "CLRWDT",
@@ -655,7 +701,8 @@
     "page": 283,
     "category": "Control Operations",
     "short": "Clear Watchdog Timer",
-    "description": "Clears the Watchdog Timer and its postscaler, then sets the TO and PD status bits."
+    "description": "Clears the Watchdog Timer and its postscaler, then sets the TO and PD status bits.",
+    "example": "watchdog_loop:\nCLRWDT               ; reset watchdog timer and postscaler\n                     ; TO = 1, PD = 1\nBRA watchdog_loop"
   },
   {
     "name": "DAW",
@@ -669,7 +716,8 @@
     "page": 286,
     "category": "Control Operations",
     "short": "Decimal Adjust WREG",
-    "description": "Adjusts WREG after adding packed decimal digits so its value represents two decimal digits. The Carry bit may change."
+    "description": "Adjusts WREG after adding packed decimal digits so its value represents two decimal digits. The Carry bit may change.",
+    "example": "MOVLW 0x09           ; packed decimal value 09\nADDLW 0x01           ; binary sum is 0x0A\nDAW                  ; adjust to packed decimal 0x10"
   },
   {
     "name": "GOTO",
@@ -683,7 +731,8 @@
     "page": 288,
     "category": "Control Operations",
     "short": "Go to address",
-    "description": "Jumps directly to program address k. It does not push a return address."
+    "description": "Jumps directly to program address k. It does not push a return address.",
+    "example": "GOTO target          ; load target address into PC\nMOVLW 0xFF           ; skipped\ntarget:\nMOVLW 0x01           ; WREG = 0x01"
   },
   {
     "name": "NOP",
@@ -697,7 +746,8 @@
     "page": 295,
     "category": "Control Operations",
     "short": "No Operation",
-    "description": "Performs no operation; execution continues at the next instruction."
+    "description": "Performs no operation; execution continues at the next instruction.",
+    "example": "MOVLW 0x05           ; WREG = 0x05\nNOP                  ; one instruction cycle; WREG unchanged\nADDLW 0x01           ; next instruction runs: WREG = 0x06"
   },
   {
     "name": "POP",
@@ -711,7 +761,8 @@
     "page": 296,
     "category": "Control Operations",
     "short": "Pop top of return stack (TOS)",
-    "description": "Removes the top entry from the hardware return stack."
+    "description": "Removes the top entry from the hardware return stack.",
+    "example": "PUSH                 ; add the address of the next instruction\nPOP                  ; discard that stack entry\nNOP                  ; execution continues here"
   },
   {
     "name": "PUSH",
@@ -725,7 +776,8 @@
     "page": 296,
     "category": "Control Operations",
     "short": "Push PC + 2 onto the return stack",
-    "description": "Pushes the address of the next instruction onto the hardware return stack."
+    "description": "Pushes the address of the next instruction onto the hardware return stack.",
+    "example": "PUSH                 ; push address of the next instruction\nPOP                  ; remove that entry; return stack restored"
   },
   {
     "name": "RCALL",
@@ -739,7 +791,8 @@
     "page": 297,
     "category": "Control Operations",
     "short": "Relative Call",
-    "description": "Pushes the address of the next instruction onto the return stack, then branches by the signed offset n from that address."
+    "description": "Pushes the address of the next instruction onto the return stack, then branches by the signed offset n from that address.",
+    "example": "MOVLW 0x05\nRCALL add_one        ; push next address, then branch by signed n\n                     ; WREG = 6 when execution returns\nGOTO done\nadd_one:\nADDLW 0x01\nRETURN               ; pop return address\ndone:\nNOP"
   },
   {
     "name": "RESET",
@@ -753,7 +806,8 @@
     "page": 297,
     "category": "Control Operations",
     "short": "Software device RESET",
-    "description": "Triggers a software device reset, affecting the same registers and flags as an MCLR Reset."
+    "description": "Triggers a software device reset, affecting the same registers and flags as an MCLR Reset.",
+    "example": "MOVLW 0x2A           ; current program state\nRESET                ; perform software reset\n                     ; execution restarts at the reset vector"
   },
   {
     "name": "RETFIE",
@@ -767,7 +821,8 @@
     "page": 298,
     "category": "Control Operations",
     "short": "Return from interrupt and re-enable interrupts",
-    "description": "Returns to the address on the return stack and re-enables interrupts. With s = 1, WREG, STATUS, and BSR are restored from their shadow registers."
+    "description": "Returns to the address on the return stack and re-enables interrupts. With s = 1, WREG, STATUS, and BSR are restored from their shadow registers.",
+    "example": "interrupt_handler:\nBSF 0x20, 0, 0       ; handle an interrupt: set a flag\nRETFIE 1             ; pop return address; re-enable interrupts\n                     ; restore WREG, STATUS, BSR from shadows"
   },
   {
     "name": "RETLW",
@@ -781,7 +836,8 @@
     "page": 298,
     "category": "Control Operations",
     "short": "Return with literal in WREG",
-    "description": "Loads the 8-bit literal k into WREG, then returns to the address on the return stack."
+    "description": "Loads the 8-bit literal k into WREG, then returns to the address on the return stack.",
+    "example": "CALL get_value       ; call subroutine below\n                     ; after return, WREG = 0x42\nGOTO done\nget_value:\nRETLW 0x42           ; load WREG, then return to caller\ndone:\nNOP"
   },
   {
     "name": "RETURN",
@@ -795,7 +851,8 @@
     "page": 299,
     "category": "Control Operations",
     "short": "Return from Subroutine",
-    "description": "Returns to the address on the return stack. With s = 1, WREG, STATUS, and BSR are restored from their shadow registers."
+    "description": "Returns to the address on the return stack. With s = 1, WREG, STATUS, and BSR are restored from their shadow registers.",
+    "example": "MOVLW 0x05           ; caller's WREG = 5\nCALL worker, 1       ; save WREG, STATUS, BSR in shadows\n                     ; WREG is 5 again after RETURN 1\nGOTO done\nworker:\nMOVLW 0x99           ; temporary WREG value\nRETURN 1             ; return and restore saved context\ndone:\nNOP"
   },
   {
     "name": "SLEEP",
@@ -809,7 +866,8 @@
     "page": 302,
     "category": "Control Operations",
     "short": "Go into Standby mode",
-    "description": "Enters Standby mode and clears the Watchdog Timer and its postscaler. The TO bit is set and the PD bit is cleared."
+    "description": "Enters Standby mode and clears the Watchdog Timer and its postscaler. The TO bit is set and the PD bit is cleared.",
+    "example": "CLRWDT               ; service watchdog before standby\nSLEEP                ; enter Standby; WDT and postscaler clear\n                     ; TO = 1, PD = 0; wait for wake-up/reset"
   },
   {
     "name": "ADDLW",
@@ -823,7 +881,8 @@
     "page": 273,
     "category": "Literal Operations",
     "short": "Add literal and WREG",
-    "description": "Adds the 8-bit literal k to WREG and writes the result back to WREG."
+    "description": "Adds the 8-bit literal k to WREG and writes the result back to WREG.",
+    "example": "MOVLW 0x10           ; WREG = 0x10\nADDLW 0x15           ; WREG = 0x10 + 0x15 = 0x25"
   },
   {
     "name": "ANDLW",
@@ -837,7 +896,8 @@
     "page": 274,
     "category": "Literal Operations",
     "short": "AND literal with WREG",
-    "description": "Applies bitwise AND to WREG and the 8-bit literal k, writing the result to WREG."
+    "description": "Applies bitwise AND to WREG and the 8-bit literal k, writing the result to WREG.",
+    "example": "MOVLW 0xF3           ; WREG = 11110011b\nANDLW 0x0F           ; WREG = 00000011b = 0x03"
   },
   {
     "name": "IORLW",
@@ -851,7 +911,8 @@
     "page": 290,
     "category": "Literal Operations",
     "short": "Inclusive OR literal with WREG",
-    "description": "Applies bitwise inclusive OR to WREG and the 8-bit literal k, writing the result to WREG."
+    "description": "Applies bitwise inclusive OR to WREG and the 8-bit literal k, writing the result to WREG.",
+    "example": "MOVLW 0x80           ; WREG = 10000000b\nIORLW 0x03           ; WREG = 10000011b = 0x83"
   },
   {
     "name": "LFSR",
@@ -865,7 +926,8 @@
     "page": 291,
     "category": "Literal Operations",
     "short": "Move literal to FSRx",
-    "description": "Loads the 12-bit literal k into the File Select Register selected by f (FSR0, FSR1, or FSR2)."
+    "description": "Loads the 12-bit literal k into the File Select Register selected by f (FSR0, FSR1, or FSR2).",
+    "example": "LFSR 1, 0x123        ; load FSR1 with file address 0x123\nMOVF INDF1, 0, 0     ; WREG = byte at address held in FSR1"
   },
   {
     "name": "MOVLB",
@@ -879,7 +941,8 @@
     "page": 292,
     "category": "Literal Operations",
     "short": "Move literal to BSR<3:0>",
-    "description": "Loads the 4-bit literal k into the Bank Select Register, selecting a bank for later file-register operations."
+    "description": "Loads the 4-bit literal k into the Bank Select Register, selecting a bank for later file-register operations.",
+    "example": "MOVLB 0x05           ; BSR = 5: select file-register bank 5\nMOVLW 0x2A\nMOVWF 0x20, 1        ; a=1: store 0x2A at full address 0x520"
   },
   {
     "name": "MOVLW",
@@ -893,7 +956,8 @@
     "page": 293,
     "category": "Literal Operations",
     "short": "Move literal to WREG",
-    "description": "Loads the 8-bit literal k into WREG."
+    "description": "Loads the 8-bit literal k into WREG.",
+    "example": "MOVLW 0x2A           ; put literal 0x2A into WREG\nMOVWF 0x20, 0        ; copy WREG to f[0x20]"
   },
   {
     "name": "MULLW",
@@ -907,7 +971,8 @@
     "page": 294,
     "category": "Literal Operations",
     "short": "Multiply literal with WREG",
-    "description": "Multiplies WREG by the unsigned 8-bit literal k. The 16-bit product is stored in PRODH:PRODL."
+    "description": "Multiplies WREG by the unsigned 8-bit literal k. The 16-bit product is stored in PRODH:PRODL.",
+    "example": "MOVLW 0x20           ; WREG = 0x20\nMULLW 0x10           ; 0x20 * 0x10 = 0x0200\n                     ; PRODH = 0x02, PRODL = 0x00"
   },
   {
     "name": "SUBLW",
@@ -921,7 +986,8 @@
     "page": 303,
     "category": "Literal Operations",
     "short": "Subtract WREG from literal",
-    "description": "Subtracts WREG from the 8-bit literal k and writes the result to WREG."
+    "description": "Subtracts WREG from the 8-bit literal k and writes the result to WREG.",
+    "example": "MOVLW 0x03           ; WREG = 3\nSUBLW 0x10           ; WREG = literal 0x10 - old WREG 3 = 0x0D"
   },
   {
     "name": "XORLW",
@@ -935,7 +1001,8 @@
     "page": 307,
     "category": "Literal Operations",
     "short": "Exclusive OR literal with WREG",
-    "description": "Applies bitwise exclusive OR to WREG and the 8-bit literal k, writing the result to WREG."
+    "description": "Applies bitwise exclusive OR to WREG and the 8-bit literal k, writing the result to WREG.",
+    "example": "MOVLW 0x5A           ; WREG = 01011010b\nXORLW 0xFF           ; WREG = 10100101b = 0xA5"
   },
   {
     "name": "TBLRD*",
@@ -949,7 +1016,8 @@
     "page": 305,
     "category": "Data & Program Memory Operations",
     "short": "Table Read",
-    "description": "Reads the program-memory byte addressed by TBLPTR into TABLAT. TBLPTR is unchanged."
+    "description": "Reads the program-memory byte addressed by TBLPTR into TABLAT. TBLPTR is unchanged.",
+    "example": "; Given TBLPTR = 0x000100 and program[0x000100] = 0xA5\nTBLRD *              ; TABLAT = 0xA5; TBLPTR stays 0x000100\nMOVF TABLAT, 0, 0    ; WREG = the byte just read"
   },
   {
     "name": "TBLRD*+",
@@ -963,7 +1031,8 @@
     "page": 305,
     "category": "Data & Program Memory Operations",
     "short": "Table Read with post-increment",
-    "description": "Reads the program-memory byte addressed by TBLPTR into TABLAT, then increments TBLPTR."
+    "description": "Reads the program-memory byte addressed by TBLPTR into TABLAT, then increments TBLPTR.",
+    "example": "; Given TBLPTR = 0x000100 and program[0x000100] = 0xA5\nTBLRD *+             ; read into TABLAT, then increment TBLPTR\n                     ; TABLAT = 0xA5; TBLPTR = 0x000101"
   },
   {
     "name": "TBLRD*-",
@@ -977,7 +1046,8 @@
     "page": 305,
     "category": "Data & Program Memory Operations",
     "short": "Table Read with post-decrement",
-    "description": "Reads the program-memory byte addressed by TBLPTR into TABLAT, then decrements TBLPTR."
+    "description": "Reads the program-memory byte addressed by TBLPTR into TABLAT, then decrements TBLPTR.",
+    "example": "; Given TBLPTR = 0x000100 and program[0x000100] = 0xA5\nTBLRD *-             ; read into TABLAT, then decrement TBLPTR\n                     ; TABLAT = 0xA5; TBLPTR = 0x0000FF"
   },
   {
     "name": "TBLRD+*",
@@ -991,7 +1061,8 @@
     "page": 305,
     "category": "Data & Program Memory Operations",
     "short": "Table Read with pre-increment",
-    "description": "Increments TBLPTR, then reads the program-memory byte at the new address into TABLAT."
+    "description": "Increments TBLPTR, then reads the program-memory byte at the new address into TABLAT.",
+    "example": "; Given TBLPTR = 0x000100 and program[0x000101] = 0x5A\nTBLRD +*             ; increment first, then read into TABLAT\n                     ; TBLPTR = 0x000101; TABLAT = 0x5A"
   },
   {
     "name": "TBLWT*",
@@ -1005,7 +1076,8 @@
     "page": 306,
     "category": "Data & Program Memory Operations",
     "short": "Table Write",
-    "description": "Copies TABLAT to the program-memory write holding register selected by TBLPTR. TBLPTR is unchanged."
+    "description": "Copies TABLAT to the program-memory write holding register selected by TBLPTR. TBLPTR is unchanged.",
+    "example": "; Given TBLPTR = 0x000100\nMOVLW 0xA5\nMOVWF TABLAT, 0      ; byte to write = 0xA5\nTBLWT *              ; holding register at 0x000100 = 0xA5\n                     ; TBLPTR unchanged; Flash needs a write cycle"
   },
   {
     "name": "TBLWT*+",
@@ -1019,7 +1091,8 @@
     "page": 306,
     "category": "Data & Program Memory Operations",
     "short": "Table Write with post-increment",
-    "description": "Copies TABLAT to the program-memory write holding register selected by TBLPTR, then increments TBLPTR."
+    "description": "Copies TABLAT to the program-memory write holding register selected by TBLPTR, then increments TBLPTR.",
+    "example": "; Given TBLPTR = 0x000100\nMOVLW 0xA5\nMOVWF TABLAT, 0\nTBLWT *+             ; write holding register at 0x000100\n                     ; then TBLPTR = 0x000101"
   },
   {
     "name": "TBLWT*-",
@@ -1033,7 +1106,8 @@
     "page": 306,
     "category": "Data & Program Memory Operations",
     "short": "Table Write with post-decrement",
-    "description": "Copies TABLAT to the program-memory write holding register selected by TBLPTR, then decrements TBLPTR."
+    "description": "Copies TABLAT to the program-memory write holding register selected by TBLPTR, then decrements TBLPTR.",
+    "example": "; Given TBLPTR = 0x000100\nMOVLW 0xA5\nMOVWF TABLAT, 0\nTBLWT *-             ; write holding register at 0x000100\n                     ; then TBLPTR = 0x0000FF"
   },
   {
     "name": "TBLWT+*",
@@ -1047,6 +1121,7 @@
     "page": 306,
     "category": "Data & Program Memory Operations",
     "short": "Table Write with pre-increment",
-    "description": "Increments TBLPTR, then copies TABLAT to the program-memory write holding register at the new address."
+    "description": "Increments TBLPTR, then copies TABLAT to the program-memory write holding register at the new address.",
+    "example": "; Given TBLPTR = 0x000100\nMOVLW 0xA5\nMOVWF TABLAT, 0\nTBLWT +*             ; first TBLPTR = 0x000101\n                     ; then holding register at 0x000101 = 0xA5"
   }
 ]

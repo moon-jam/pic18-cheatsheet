@@ -8,22 +8,6 @@ import pack from "../../../../data/reference.json";
 import Sidebar from "~/components/sidebar";
 import { codeToHtml } from "shiki";
 
-function example(name: string, syntax: string): string {
-  if (name === "ADDLW") return "MOVLW 0x10\nADDLW 0x15 ; WREG = 0x25";
-  if (name === "MOVFF") return "MOVFF 0x020, 0x021";
-  if (name === "LFSR") return "LFSR 0, 0x123";
-  if (name === "MOVLB") return "MOVLB 0x05";
-  if (name === "CALL") return "CALL 0x0100, 0";
-  if (name === "GOTO") return "GOTO 0x0100";
-  if (name === "RETURN" || name === "RETFIE") return `${name} 0`;
-  if (/^(BC|BN|BNC|BNN|BNOV|BNZ|BOV|BRA|BZ|RCALL)$/.test(name)) return `${name} target\ntarget: NOP`;
-  if (/ f, b/.test(syntax)) return `${name} 0x20, 3, 0`;
-  if (/ f \{,d/.test(syntax)) return `${name} 0x20, 0, 0`;
-  if (/ f \{,a/.test(syntax)) return `${name} 0x20, 0`;
-  if (/ k/.test(syntax)) return `${name} 0x15`;
-  return name;
-}
-
 export const useInstruction = routeLoader$(({ params }) => {
   const instr = pack.find((i) => i.name.toLowerCase() === params.instruction);
   if (!instr) {
@@ -95,7 +79,7 @@ export default component$(() => {
             <h2 class="text-2xl font-semibold mb-4 text-primary-800">
               Example
             </h2>
-            <Code code={example(instr.value.name, instr.value.syntax)} />
+            <Code code={instr.value.example} />
           </section>
 
           <footer class="text-center text-primary-600 mt-auto">
