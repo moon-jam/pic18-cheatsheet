@@ -6,7 +6,7 @@ import type {
 import { routeLoader$ } from "@builder.io/qwik-city";
 import pack from "../../../../data/reference.json";
 import Sidebar from "~/components/sidebar";
-import Code from "~/components/code";
+import InstructionDetail from "~/components/instruction-detail";
 
 export const useInstruction = routeLoader$(({ params }) => {
   const instr = pack.find((i) => i.name.toLowerCase() === params.instruction);
@@ -28,48 +28,7 @@ export default component$(() => {
       />
       <div class="min-w-0 grow-1 h-full bg-chat-bg flex justify-center">
         <div class="p-8 w-full max-w-5xl bg-primary-50 h-screen flex flex-col overflow-y-auto nobar">
-          <h1 class="text-4xl font-bold mb-8 text-center text-primary-800">
-            {instr.value.name}
-          </h1>
-          <section class="mb-8">
-            <h2 class="text-2xl font-semibold mb-4 text-primary-800">
-              Instruction
-            </h2>
-            <table class="w-full text-primary-700 text-lg border-collapse">
-              <tbody>
-                <tr class="border-b border-outline"><th scope="row" class="w-40 text-left p-2 align-top">Syntax</th><td class="p-2 font-mono">{instr.value.syntax}</td></tr>
-                <tr class="border-b border-outline"><th scope="row" class="text-left p-2 align-top">Operands</th><td class="p-2">{instr.value.operands}</td></tr>
-                <tr class="border-b border-outline"><th scope="row" class="text-left p-2 align-top">Operation</th><td class="p-2">{instr.value.operation}</td></tr>
-                <tr class="border-b border-outline"><th scope="row" class="text-left p-2 align-top">Status affected</th><td class="p-2">{instr.value.status}</td></tr>
-                <tr class="border-b border-outline"><th scope="row" class="text-left p-2 align-top">Encoding</th><td class="p-2 font-mono break-all">{instr.value.encoding}</td></tr>
-                <tr><th scope="row" class="text-left p-2 align-top">Words / cycles</th><td class="p-2">{instr.value.words} / {instr.value.cycles}</td></tr>
-              </tbody>
-            </table>
-          </section>
-
-          <section class="mb-8">
-            <h2 class="text-2xl font-semibold mb-4 text-primary-800">
-              Description
-            </h2>
-            <p class="text-primary-700 text-lg">{instr.value.description}</p>
-          </section>
-
-          <section class="mb-8">
-            <h2 class="text-2xl font-semibold mb-4 text-primary-800">
-              Example
-            </h2>
-            <Code code={instr.value.example} />
-          </section>
-
-          <footer class="text-center text-primary-600 mt-auto">
-            <p><a href={`https://ww1.microchip.com/downloads/en/DeviceDoc/39631E.pdf#page=${instr.value.page + 2}`} target="_blank" rel="noopener noreferrer" class="underline">Microchip DS39631E, p. {instr.value.page}</a></p>
-            <p>
-              Back to{" "}
-              <a href=".." class="underline">
-                PIC18 ISA Cheatsheet
-              </a>
-            </p>
-          </footer>
+          <InstructionDetail entry={instr.value} />
         </div>
       </div>
     </div>

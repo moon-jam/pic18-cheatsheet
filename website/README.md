@@ -89,3 +89,17 @@ Open `http://127.0.0.1:4173/`. All cheatsheet pages can then be browsed without 
 internet connection. Official documentation and GitHub links still require one.
 The hosted site has no service worker or complete offline cache; visiting it once
 does not guarantee that every page will be available after disconnecting.
+
+## Complete print / PDF reference
+
+Choose **Print / PDF** on the homepage, then use the browser's Print command
+(Ctrl+P or Cmd+P) to print or save as PDF. The `/print/` page starts with the
+homepage index and includes every instruction, register, and documented assembler
+directive. Index links jump to the corresponding details; **Back to index**
+returns to the same index entry. These internal links are retained when saved as
+PDF, so the complete file can be browsed offline.
+
+Print styles use a white background, page numbers, wrapped examples, and repeated
+table headers. A4 is the default; Letter can be selected in the print dialog.
+Use the default scale and turn off the browser's headers and footers. External
+Microchip source links still require an internet connection.
