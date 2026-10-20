@@ -73,3 +73,19 @@ Typically you'd set the `Cache-Control` header for those files to `public, max-a
 ```shell
 pnpm build.server
 ```
+
+## Offline browsing
+
+The generated site has no required external assets or backend. After installing
+dependencies and building while online, keep the complete `dist` directory:
+
+```shell
+pnpm build
+pnpm purify
+python3 -m http.server 4173 --bind 127.0.0.1 --directory dist
+```
+
+Open `http://127.0.0.1:4173/`. All cheatsheet pages can then be browsed without an
+internet connection. Official documentation and GitHub links still require one.
+The hosted site has no service worker or complete offline cache; visiting it once
+does not guarantee that every page will be available after disconnecting.

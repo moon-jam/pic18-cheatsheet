@@ -1,4 +1,4 @@
-import { component$, useSignal, useTask$ } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 import type {
   DocumentHead,
   StaticGenerateHandler,
@@ -6,7 +6,7 @@ import type {
 import { routeLoader$ } from "@builder.io/qwik-city";
 import pack from "../../../../data/reference.json";
 import Sidebar from "~/components/sidebar";
-import { codeToHtml } from "shiki";
+import Code from "~/components/code";
 
 export const useInstruction = routeLoader$(({ params }) => {
   const instr = pack.find((i) => i.name.toLowerCase() === params.instruction);
@@ -16,34 +16,13 @@ export const useInstruction = routeLoader$(({ params }) => {
   return instr;
 });
 
-const Code = component$(({ code }: { code: string }) => {
-  const html = useSignal("");
-
-  useTask$(async () => {
-    const [dark, light] = await Promise.all([
-      codeToHtml(code, {
-        lang: "asm",
-        theme: "github-dark",
-      }),
-      codeToHtml(code, {
-        lang: "asm",
-        theme: "github-light",
-      }),
-    ]);
-
-    html.value = `<div class="p-3 bg-code-bg rounded mb-4 overflow-auto border border-gray-300"><div class="dark:block hidden">${dark}</div><div class="dark:hidden">${light}</div></div>`;
-  });
-
-  return <div dangerouslySetInnerHTML={html.value} />;
-});
-
 export default component$(() => {
   const instr = useInstruction();
 
   return (
     <div class="flex flex-row h-screen w-screen md:static relative">
       <Sidebar
-        class="shrink-0 h-full md:w-auto w-screen absolute md:static"
+        class="shrink-0 h-full absolute md:static"
         selectedCategory={instr.value.category}
         selectedEntry={instr.value.name}
       />

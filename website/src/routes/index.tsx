@@ -3,6 +3,8 @@ import type { DocumentHead } from "@builder.io/qwik-city";
 
 import instructions from "../../../data/reference.json";
 import { LuStar, LuTerminal } from "@qwikest/icons/lucide";
+import RegisterList from "~/components/register-list";
+import DirectiveList from "~/components/directive-list";
 
 export default component$(() => {
   const grouped = instructions.reduce(
@@ -19,6 +21,7 @@ export default component$(() => {
   return (
     <div class="min-w-0 grow-1 h-screen w-screen bg-chat-bg flex justify-center py-4 overflow-y-auto text-text">
       <div class="max-w-6xl w-full space-y-8 p-4">
+        <nav class="flex flex-wrap gap-6 font-semibold"><a href="#instructions" class="underline">Instructions</a><a href="#registers" class="underline">Registers</a><a href="#directives" class="underline">Assembler Directives</a></nav>
         <div class="rounded-lg border border-outline p-3 text-sm leading-6">
           <h2 class="font-semibold mb-2">Operand guide</h2>
           <table class="w-full text-left">
@@ -39,6 +42,7 @@ export default component$(() => {
             <a href="https://ww1.microchip.com/downloads/en/DeviceDoc/39631E.pdf#page=272" target="_blank" rel="noopener noreferrer" class="underline">Instruction list: Table 24-2</a>
           </div>
         </div>
+        <div id="instructions" />
         {Object.entries(grouped).map(([category, items]) => (
           <section key={category}>
             <h2 class="text-2xl font-bold mb-4 border-b border-outline pb-2 select-none flex justify-start items-center">
@@ -70,6 +74,8 @@ export default component$(() => {
             </div>
           </section>
         ))}
+        <RegisterList />
+        <DirectiveList />
         <div class="flex justify-center">
           <a
             href="https://github.com/Eason0729/pic18-cheatsheet"

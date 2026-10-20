@@ -1,0 +1,28 @@
+[
+  {
+    "name": "PSECT",
+    "syntax": "PSECT name[,flag...]",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Declare or resume a code or data section",
+    "description": "Groups the following code or data into a named program section. The assembler records its contents and attributes; the linker later assigns its address. Repeating PSECT with the same name resumes that section.",
+    "operands": [
+      { "name": "name", "description": "Section name, such as myCode. The name identifies the section; it is not a memory address." },
+      { "name": "flag...", "description": "Optional comma-separated attributes. When resuming an existing section, its name alone is sufficient." }
+    ],
+    "flags": [
+      { "name": "class=CODE", "description": "Associate the section with the linker's CODE memory range for program code. The linker chooses its final address." },
+      { "name": "reloc=2", "description": "Align the section start to an even byte address, as required for PIC18 instructions. This does not select a fixed address." },
+      { "name": "space=0", "description": "Use program-memory address space. This is the default and can be omitted for code." },
+      { "name": "delta=1", "description": "Use byte address units, as required for PIC18. This is the default." }
+    ],
+    "notes": [
+      "PSECT is processed while assembling. It has no processor opcode or execution cycle count.",
+      "The example defines a code section; data sections require attributes appropriate to their memory space."
+    ],
+    "example": "#include <xc.inc>\n\nPSECT myCode,class=CODE,reloc=2\nfirst_value:\n    MOVLW 0x2A           ; first routine loads WREG with 0x2A\n    RETURN\n\n; Append another routine to the same section.\nPSECT myCode\nsecond_value:\n    MOVLW 0x00           ; second routine loads WREG with 0\n    RETURN\n; The linker assigns myCode an even program-memory address.",
+    "sources": [
+      { "title": "PIC Assembler User's Guide: Program Sections", "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-5F6E71C1-EC07-4F8F-9CDB-2215A06A6890.html" },
+      { "title": "Microchip: PIC18 code-section attributes", "url": "https://onlinedocs.microchip.com/oxy/GUID-6EF91A11-1A5C-4C0A-8A18-67AD6D50B17B-en-US-2/GUID-D6807CA7-E906-4EE9-970C-FEC4E70724A0.html" }
+    ]
+  }
+]
