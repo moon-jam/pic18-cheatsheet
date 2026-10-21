@@ -6,7 +6,7 @@ import Sidebar from "~/components/sidebar";
 import DirectiveDetail from "~/components/directive-detail";
 
 export const useDirective = routeLoader$(({ params }) => {
-  const directive = directives.find((d) => d.name.toLowerCase() === params.directive);
+  const directive = directives.find((d) => d.slug === params.directive);
   if (!directive) throw new Response("Not Found", { status: 404 });
   return directive;
 });
@@ -26,5 +26,5 @@ export default component$(() => {
   );
 });
 
-export const head: DocumentHead = ({ params }) => ({ title: `${params.directive.toUpperCase()} - PIC18 Assembler Directives` });
-export const onStaticGenerate: StaticGenerateHandler = async () => ({ params: directives.map((d) => ({ directive: d.name.toLowerCase() })) });
+export const head: DocumentHead = ({ params }) => ({ title: `${directives.find((d) => d.slug === params.directive)?.name || params.directive} - PIC18 Assembler Directives` });
+export const onStaticGenerate: StaticGenerateHandler = async () => ({ params: directives.map((d) => ({ directive: d.slug })) });

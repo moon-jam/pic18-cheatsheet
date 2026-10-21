@@ -4,25 +4,351 @@
     "syntax": "PSECT name[,flag...]",
     "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
     "short": "Declare or resume a code or data section",
-    "description": "Groups the following code or data into a named program section. The assembler records its contents and attributes; the linker later assigns its address. Repeating PSECT with the same name resumes that section.",
+    "description": "Groups code or data into a named program section. PSECT selects where subsequent instructions, DB/DW data, or DS storage belong. The linker places relocatable sections in memory; absolute sections use fixed addresses. Repeating the same name resumes that section.",
     "operands": [
-      { "name": "name", "description": "Section name, such as myCode. The name identifies the section; it is not a memory address." },
-      { "name": "flag...", "description": "Optional comma-separated attributes. When resuming an existing section, its name alone is sufficient." }
+      {
+        "name": "name",
+        "description": "Section name, such as myCode. The name identifies the section; it is not a memory address."
+      },
+      {
+        "name": "flag...",
+        "description": "Optional comma-separated attributes. When resuming an existing section, its name alone is sufficient."
+      }
     ],
     "flags": [
-      { "name": "class=CODE", "description": "Associate the section with the linker's CODE memory range for program code. The linker chooses its final address." },
-      { "name": "reloc=2", "description": "Align the section start to an even byte address, as required for PIC18 instructions. This does not select a fixed address." },
-      { "name": "space=0", "description": "Use program-memory address space. This is the default and can be omitted for code." },
-      { "name": "delta=1", "description": "Use byte address units, as required for PIC18. This is the default." }
+      {
+        "name": "class=name",
+        "description": "Allowed memory range: CODE for instructions; CONST for constants; COMRAM for Access Bank variables; BANK1 for bank 1 variables."
+      },
+      {
+        "name": "space=0 / space=1",
+        "description": "0 = program memory (also EEPROM on PIC18); 1 = data memory. Banks share space=1 and are distinguished by their full addresses."
+      },
+      {
+        "name": "delta=1",
+        "description": "One byte per address unit; use this default for PIC18. DW still emits two bytes per value."
+      },
+      {
+        "name": "reloc=2",
+        "description": "Start at an even byte address, required for PIC18 executable code. More generally, reloc sets a power-of-two alignment; it does not fix an address."
+      },
+      {
+        "name": "bit",
+        "description": "Allocate bit-sized objects. DS counts bits and labels hold bit addresses; divide a label by 8 for the byte address and use label & 7 for the bit number."
+      },
+      {
+        "name": "abs",
+        "description": "Section base is zero and cannot be relocated by the linker. Combine with ovrld and ORG for a fixed location."
+      },
+      {
+        "name": "ovrld",
+        "description": "Overlay contributions from different source modules instead of concatenating them. Combined with abs, labels have absolute addresses. It does not make overlapping executable contents safe."
+      },
+      {
+        "name": "global / local",
+        "description": "global is the default: combine same-name sections across modules. local keeps each module's section separate; use a class to place it."
+      },
+      {
+        "name": "size=max",
+        "description": "Maximum section size, checked after contributions from modules have been combined."
+      },
+      {
+        "name": "limit=address",
+        "description": "Highest permitted address of the section; checked at link time (PIC18 only)."
+      },
+      {
+        "name": "lowdata",
+        "description": "Keep the whole section below address 0x1000; this is not an Access Bank selector."
+      },
+      {
+        "name": "noexec",
+        "description": "Mark non-executable contents for debugging. It does not prevent the processor from executing those bytes."
+      },
+      {
+        "name": "pure",
+        "description": "Declare contents read-only; actual enforcement depends on the target and linker."
+      },
+      {
+        "name": "with=section",
+        "description": "Place this section in the same memory page as the named section."
+      },
+      {
+        "name": "note",
+        "description": "Tool/debugger information that is excluded from the final program image."
+      },
+      {
+        "name": "optim=names",
+        "description": "Colon-separated optimization permissions. Has no effect in standalone pic-as, which performs no optimizations."
+      },
+      {
+        "name": "inline / keep / merge / split",
+        "description": "Deprecated optimization attributes; the guide uses optim instead. They are not needed for the examples below."
+      }
     ],
     "notes": [
-      "PSECT is processed while assembling. It has no processor opcode or execution cycle count.",
-      "The example defines a code section; data sections require attributes appropriate to their memory space."
+      "A section name is an identifier, not a memory type or an address. Its attributes and linker class determine placement. A linker class names an allowed range of addresses.",
+      "Include <xc.inc> to use predefined sections and linker classes. In PIC18 assembly, the predefined data section holds constants in program memory; it does not create initialized variables in data memory.",
+      "DS reserves storage without initializing it. To give a variable an initial value, execute a store instruction, or copy an initial value from program memory.",
+      "Resuming a section keeps its attributes. Within one source file, new contents append to that section, even with ovrld. Global sections with the same name normally concatenate across object files; ovrld overlays their contributions instead.",
+      "global here concerns section merging; it does not export labels. Use the GLOBAL directive to make a label visible to other source modules.",
+      "PSECT itself is processed during assembly and has no processor opcode or execution cycle count."
     ],
     "example": "#include <xc.inc>\n\nPSECT myCode,class=CODE,reloc=2\nfirst_value:\n    MOVLW 0x2A           ; first routine loads WREG with 0x2A\n    RETURN\n\n; Append another routine to the same section.\nPSECT myCode\nsecond_value:\n    MOVLW 0x00           ; second routine loads WREG with 0\n    RETURN\n; The linker assigns myCode an even program-memory address.",
     "sources": [
-      { "title": "PIC Assembler User's Guide: Program Sections", "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-5F6E71C1-EC07-4F8F-9CDB-2215A06A6890.html" },
-      { "title": "Microchip: PIC18 code-section attributes", "url": "https://onlinedocs.microchip.com/oxy/GUID-6EF91A11-1A5C-4C0A-8A18-67AD6D50B17B-en-US-2/GUID-D6807CA7-E906-4EE9-970C-FEC4E70724A0.html" }
+      {
+        "title": "PIC Assembler User's Guide: PSECT and attributes",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-7DCD239F-8593-4271-9DEA-6BDB1AED392C.html"
+      },
+      {
+        "title": "PIC Assembler User's Guide: Program Sections",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-5F6E71C1-EC07-4F8F-9CDB-2215A06A6890.html"
+      },
+      {
+        "title": "PIC Assembler User's Guide: Assembler-provided Psects",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-F1580327-3B63-459E-A148-CB2E1E298B3B.html"
+      }
+    ],
+    "slug": "psect",
+    "tables": [
+      {
+        "title": "Predefined PIC18 sections",
+        "rows": [
+          {
+            "name": "code (CODE)",
+            "description": "Executable instructions in program memory."
+          },
+          {
+            "name": "data (CONST)",
+            "description": "DB/DW constants in program memory."
+          },
+          {
+            "name": "edata (EEDATA)",
+            "description": "Initial contents to program into the device's EEPROM (Electrically Erasable Programmable Read-Only Memory)."
+          },
+          {
+            "name": "udata (RAM)",
+            "description": "Uninitialized variables in general-purpose data memory."
+          },
+          {
+            "name": "udata_acs (COMRAM)",
+            "description": "Uninitialized variables in the Access Bank's general-purpose memory."
+          },
+          {
+            "name": "udata_bankn (BANKN)",
+            "description": "Uninitialized variables in bank n, for example udata_bank1. The bank must exist on the device."
+          }
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "title": "Program-memory constants",
+        "code": "#include <xc.inc>\n\nPSECT data\nmessage:\n    DB \"OK\",0             ; bytes: 4F 4B 00\nvalues:\n    DW 0x1234             ; bytes: 34 12 on PIC18\n; These bytes are stored in program memory.\n; Read them with TBLPTR, TBLRD and TABLAT."
+      },
+      {
+        "title": "Access Bank variables",
+        "code": "#include <xc.inc>\n\nPSECT udata_acs\ncounter: DS 1             ; reserve one byte; no initial value\n\nPSECT accessCode,class=CODE,reloc=2\ninit_counter:\n    CLRF counter,0        ; execute to initialize counter to 0\n    RETURN"
+      },
+      {
+        "title": "Variables in a specific bank",
+        "code": "#include <xc.inc>\n\nPSECT udata_bank1\nmyBuffer: DS 4            ; four bytes in bank 1\n\nPSECT bankCode,class=CODE,reloc=2\nstore_first:\n    BANKSEL myBuffer      ; select the bank containing myBuffer\n    MOVLW 0x2A\n    MOVWF BANKMASK(myBuffer),1 ; banked access: myBuffer[0] = 0x2A\n    RETURN"
+      },
+      {
+        "title": "Bit variables",
+        "code": "#include <xc.inc>\n\nPSECT bitVars,class=COMRAM,space=1,bit\nready: DS 1               ; reserve one bit, not one byte\n\nPSECT bitCode,class=CODE,reloc=2\nclear_ready:\n    BCF ready/8,ready&7,0 ; byte address = ready/8; bit = ready&7\n    RETURN"
+      },
+      {
+        "title": "Fixed reset vector",
+        "code": "#include <xc.inc>\n\nPSECT resetVec,class=CODE,abs,ovrld,reloc=2\nORG 0x0000\n    GOTO start            ; reset vector at program address 0\n\nPSECT appCode,class=CODE,reloc=2\nstart:\n    BRA start             ; linker places this code elsewhere\n; In a relocatable section, ORG is an offset within the section.\n; ORG alone does not give a relocatable section a fixed address."
+      },
+      {
+        "title": "Place a relocatable section with the linker",
+        "code": "#include <xc.inc>\n\nPSECT placedCode,class=CODE,reloc=2\nroutine:\n    RETURN\n; At link time, pass this pic-as driver option:\n;   -Wl,-PplacedCode=0x200\n; This places the section at program address 0x200.\n; Do not combine this placement option with an abs section."
+      }
+    ],
+    "related": [
+      "DB",
+      "DW",
+      "DS"
+    ]
+  },
+  {
+    "name": "DB",
+    "slug": "db",
+    "syntax": "DB value[,value...]",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Store bytes in program memory",
+    "description": "Emits one byte for each numeric value or character into the current program-memory section. A string emits its characters in order.",
+    "operands": [
+      {
+        "name": "value",
+        "description": "An 8-bit value, character, or string; separate multiple items with commas."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "On PIC18 with delta=1, bytes are consecutive with no padding between them. Strings have no automatic zero terminator; add ,0 when required.",
+      "DB does not allocate a variable in data memory. Use DS for storage there. Data bytes must not be reached as executable code."
+    ],
+    "example": "#include <xc.inc>\n\nPSECT data\nmessage:\n    DB \"OK\",0             ; three bytes: 4F 4B 00\n\nPSECT readBytes,class=CODE,reloc=2\nread_message:\n    MOVLW LOW(message)\n    MOVWF TBLPTRL,0\n    MOVLW HIGH(message)\n    MOVWF TBLPTRH,0\n    MOVLW LOW HIGHWORD(message)\n    MOVWF TBLPTRU,0\n    TBLRD*+               ; TABLAT = 0x4F (O); pointer advances\n    TBLRD*+               ; TABLAT = 0x4B (K)\n    TBLRD*                ; TABLAT = 0x00 (terminator)\n    RETURN",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: DB",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-B154D795-F7E7-497E-8968-8F3256F6A956.html"
+      }
+    ],
+    "related": [
+      "DW",
+      "DS",
+      "PSECT"
+    ]
+  },
+  {
+    "name": "DW",
+    "slug": "dw",
+    "syntax": "DW value[,value...]",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Store 16-bit words in program memory",
+    "description": "Emits two bytes for each numeric value or character into the current program-memory section. On PIC18 the low byte comes first.",
+    "operands": [
+      {
+        "name": "value",
+        "description": "A 16-bit value, character, or string; each string character occupies a separate 16-bit word."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "A PIC18 address unit is still one byte (delta=1); DW determines the width of each emitted value. No automatic string terminator is added.",
+      "DW does not reserve data-memory variables. This page documents pic-as; PIC18 behavior in older MPASM code differs."
+    ],
+    "example": "#include <xc.inc>\n\nPSECT data\nwords:\n    DW 0x1234,0xABCD      ; four bytes: 34 12 CD AB\n\nPSECT readWords,class=CODE,reloc=2\nread_first_word:\n    MOVLW LOW(words)\n    MOVWF TBLPTRL,0\n    MOVLW HIGH(words)\n    MOVWF TBLPTRH,0\n    MOVLW LOW HIGHWORD(words)\n    MOVWF TBLPTRU,0\n    TBLRD*+               ; TABLAT = 0x34 (low byte)\n    MOVFF TABLAT,PRODL\n    TBLRD*+               ; TABLAT = 0x12 (high byte)\n    MOVFF TABLAT,PRODH    ; PRODH:PRODL = 0x1234\n    RETURN",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: DW",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-B77060F7-9740-47DD-BDAA-B2331637DACE.html"
+      },
+      {
+        "title": "MPASM migration: DW differences",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-6EF91A11-1A5C-4C0A-8A18-67AD6D50B17B-en-US-2/GUID-0285415E-FFF9-486A-AADE-556975118F4C.html"
+      }
+    ],
+    "related": [
+      "DB",
+      "DS",
+      "PSECT"
+    ]
+  },
+  {
+    "name": "DS",
+    "slug": "ds",
+    "syntax": "DS count",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Reserve uninitialized storage",
+    "description": "Reserves space in the current section without giving it an initial value. In an ordinary PIC18 data-memory section, count is the number of bytes; in a bit section, it is the number of bits.",
+    "operands": [
+      {
+        "name": "count",
+        "description": "Number of address units to reserve; use a data-memory section for variables."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "The label identifies the reserved storage. Initialize it by executing instructions; DS 1 does not store the number 1."
+    ],
+    "example": "#include <xc.inc>\n\nPSECT udata_acs\ncounter: DS 1             ; one uninitialized byte\nbuffer:  DS 4             ; four uninitialized bytes\n\nPSECT initVars,class=CODE,reloc=2\ninit_vars:\n    CLRF counter,0        ; counter = 0 at runtime\n    MOVLW 0x2A\n    MOVWF buffer,0        ; first buffer byte = 0x2A\n    RETURN",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: DS",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-F3BAE0C3-7248-4DED-9089-D9B0471468D4.html"
+      }
+    ],
+    "related": [
+      "DB",
+      "DW",
+      "EQU",
+      "PSECT"
+    ]
+  },
+  {
+    "name": "EQU",
+    "slug": "equ",
+    "syntax": "symbol EQU expression",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Define an assembler constant",
+    "description": "Gives a symbol a constant value that the assembler can use in expressions. It emits no data and reserves no storage.",
+    "operands": [
+      {
+        "name": "symbol",
+        "description": "New name placed before EQU, with no colon."
+      },
+      {
+        "name": "expression",
+        "description": "Constant expression to associate with the symbol."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "The symbol must not already be defined in the same module. EQU cannot redefine a value; SET is available when redefinition is needed.",
+      "EQU creates an assembler symbol. #define replaces source text before assembly and can take arguments; the two mechanisms are different."
+    ],
+    "example": "#include <xc.inc>\n\nITEM_COUNT EQU 5\nSTEP_SIZE  EQU 2\n\nPSECT equCode,class=CODE,reloc=2\nload_count:\n    MOVLW ITEM_COUNT      ; WREG = 5\n    ADDLW STEP_SIZE       ; WREG = 7\n    RETURN\n; ITEM_COUNT and STEP_SIZE occupy no data-memory bytes.",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: EQU",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-86FBFB98-CAA8-4B8F-95C3-119969CB97B6.html"
+      }
+    ],
+    "related": [
+      "#define",
+      "DS"
+    ]
+  },
+  {
+    "name": "#define",
+    "slug": "define",
+    "syntax": "#define name[(parameters)] replacement",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Replace source text before assembly",
+    "description": "Defines a preprocessor macro: a name that is replaced by source text before the assembler sees it. A macro can also accept parameters.",
+    "operands": [
+      {
+        "name": "name",
+        "description": "Case-sensitive macro name."
+      },
+      {
+        "name": "parameters",
+        "description": "Optional comma-separated names in parentheses immediately after the macro name; no intervening space."
+      },
+      {
+        "name": "replacement",
+        "description": "Text to substitute; parenthesize expression parameters and the complete expression."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "Use a .S source filename (uppercase S), or the pic-as option -xassembler-with-cpp, to enable preprocessing. #define is a preprocessor directive, not an executable instruction.",
+      "It allocates no storage. Use EQU for an assembler constant or DS for a variable. End #define at the newline; use C-style comments on its line rather than an assembler semicolon comment."
+    ],
+    "example": "#include <xc.inc>\n\n#define BASE_VALUE 0x20\n#define NEXT_VALUE(x) ((x) + 1)\n\nPSECT defineCode,class=CODE,reloc=2\nload_next:\n    MOVLW NEXT_VALUE(BASE_VALUE)\n    ; After preprocessing: MOVLW ((0x20) + 1)\n    ; Executing the instruction sets WREG to 0x21.\n    RETURN",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: Preprocessor Directives",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-3F9A9267-BEDE-455C-A3E9-8B3E2B666177.html"
+      }
+    ],
+    "related": [
+      "EQU",
+      "DS"
     ]
   }
 ]

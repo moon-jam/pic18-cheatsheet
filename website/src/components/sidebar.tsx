@@ -105,7 +105,7 @@ export default component$(
               entries={[{
                 value: "Assembler Directives",
                 trigger: <div class="font-semibold py-2 text-lg duration-150 rounded-md hover:bg-primary px-4 select-none">Assembler Directives</div>,
-                content: <>{directives.map((d) => <a key={d.name} href={`${props.baseHref || "../"}directives/${d.name.toLowerCase()}/`} data-state={d.name === props.selectedEntry ? "selected" : ""} class="flex items-center rounded-sm text-base duration-150 hover:bg-primary p-1.5 pl-4 select-none data-[state=selected]:bg-secondary">{d.name}</a>)}</>,
+                content: <>{directives.map((d) => <a key={d.name} href={`${props.baseHref || "../"}directives/${d.slug}/`} data-state={d.name === props.selectedEntry ? "selected" : ""} class="flex items-center rounded-sm text-base duration-150 hover:bg-primary p-1.5 pl-4 select-none data-[state=selected]:bg-secondary">{d.name}</a>)}</>,
               }]}
             />
           </div>
