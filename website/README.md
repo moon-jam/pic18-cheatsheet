@@ -107,7 +107,8 @@ Microchip source links still require an internet connection.
 ## Search
 
 Search on the homepage or in the sidebar filters names, operands, addresses,
-and descriptions immediately. Multiple words must all match. Clear the field or
+and descriptions immediately. Matching text is highlighted with a subtle orange
+background. Multiple words must all match. Clear the field or
 press Escape to restore the full list. Search uses the entries already in the
 page and works offline with the complete static build.
 

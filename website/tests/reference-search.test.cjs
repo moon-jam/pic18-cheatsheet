@@ -69,6 +69,48 @@ test('multiple terms match descriptions; no matches and Escape restore the index
   dom.window.close();
 });
 
+test('highlights preserve text, links, and columns through edits and clearing', () => {
+  const dom = load();
+  const doc = dom.window.document;
+  const items = [...doc.querySelectorAll('[data-search-item]')];
+  const original = items.map(item => [item.textContent, item.getAttribute('href')]);
+  let matches = query(dom, 'ａｄｄ');
+  const addlw = matches.find(item => item.querySelector('strong').textContent === 'ADDLW');
+  assert.equal(addlw.querySelector('strong mark').textContent, 'ADD');
+  assert.equal(addlw.children.length, 3, 'marks stay inside the existing columns');
+  matches = query(dom, 'add dl');
+  assert.equal(addlw.querySelector('strong mark').textContent, 'ADDL', 'overlapping terms merge');
+  matches = query(dom, 'TBLRD*+');
+  assert.equal(matches[0].querySelector('strong mark').textContent, 'TBLRD*+');
+  matches = query(dom, 'bit skip');
+  const btfsc = matches.find(item => item.querySelector('strong').textContent === 'BTFSC');
+  assert.deepEqual([...btfsc.querySelectorAll('span mark')].map(mark => mark.textContent.toLowerCase()), ['bit', 'skip']);
+  query(dom, 'no-such-reference-zz');
+  assert.equal(doc.querySelectorAll('mark').length, 0, 'hidden entries lose stale marks');
+  query(dom, 'ADD');
+  doc.querySelector('[data-search-input]').dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'Escape' }));
+  assert.equal(doc.querySelectorAll('mark').length, 0);
+  assert.deepEqual(items.map(item => [item.textContent, item.getAttribute('href')]), original);
+  dom.window.close();
+});
+
+test('sidebar highlights remain inline and do not change the selected entry', () => {
+  const dom = load('/registers/status/');
+  const doc = dom.window.document;
+  const selected = doc.querySelector('[data-search-item][data-state="selected"]');
+  const matches = query(dom, 'tus');
+  const status = matches.find(item => item.textContent === 'STATUS');
+  assert.equal(status, selected);
+  assert.equal(status.children.length, 1);
+  assert.equal(status.firstElementChild.tagName, 'SPAN');
+  assert.equal(status.querySelector('span mark').textContent, 'TUS');
+  assert.equal(query(dom, '#include')[0].querySelector('span mark').textContent, '#include');
+  query(dom, '', 'search');
+  assert.equal(doc.querySelectorAll('mark').length, 0);
+  assert.equal(selected.getAttribute('data-state'), 'selected');
+  dom.window.close();
+});
+
 test('sidebar filters all categories while retaining its selected accordion', () => {
   const dom = load('/registers/status/');
   const doc = dom.window.document;
@@ -107,6 +149,7 @@ test('leaving the index saves the view; a homepage visit restores search and scr
   const returned = load('/', { saved });
   assert.equal(returned.window.document.querySelector('[data-search-input]').value, 'branch');
   assert.equal(returned.window.document.querySelector('[data-reference-search-root]').scrollTop, 420);
+  assert.ok(returned.window.document.querySelector('[data-search-item] mark'));
   assert.equal(returned.window.document.querySelectorAll('[data-search-item]:not([hidden])').length, matches.length);
   dom.window.close(); returned.window.close();
 });

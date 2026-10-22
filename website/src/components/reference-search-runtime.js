@@ -1,5 +1,64 @@
 (() => {
   const normalize = (value) => value.normalize("NFKC").toLowerCase();
+  const textParts = (element) => {
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    const parts = [];
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      const text = node.data;
+      const offsets = [];
+      let normalized = "";
+      let offset = 0;
+      for (const character of text) {
+        const value = normalize(character);
+        for (let i = 0; i < value.length; i++)
+          offsets.push([offset, offset + character.length]);
+        normalized += value;
+        offset += character.length;
+      }
+      parts.push({ node, text, normalized, offsets, inserted: [] });
+    }
+    return parts;
+  };
+  const highlight = (parts, terms) => {
+    for (const part of parts) {
+      for (const node of part.inserted) node.remove();
+      part.inserted = [];
+      part.node.data = part.text;
+      const ranges = [];
+      for (const term of terms) {
+        let start = part.normalized.indexOf(term);
+        while (start !== -1) {
+          ranges.push([
+            part.offsets[start][0],
+            part.offsets[start + term.length - 1][1],
+          ]);
+          start = part.normalized.indexOf(term, start + 1);
+        }
+      }
+      ranges.sort((a, b) => a[0] - b[0]);
+      const merged = [];
+      for (const range of ranges) {
+        const last = merged[merged.length - 1];
+        if (last && range[0] <= last[1]) last[1] = Math.max(last[1], range[1]);
+        else merged.push(range);
+      }
+      if (!merged.length) continue;
+      const fragment = document.createDocumentFragment();
+      let offset = 0;
+      for (const [start, end] of merged) {
+        fragment.append(document.createTextNode(part.text.slice(offset, start)));
+        const mark = document.createElement("mark");
+        mark.className = "search-match";
+        mark.textContent = part.text.slice(start, end);
+        fragment.append(mark);
+        offset = end;
+      }
+      part.inserted = Array.from(fragment.childNodes);
+      part.node.before(fragment);
+      part.node.data = part.text.slice(offset);
+    }
+  };
 
   for (const root of document.querySelectorAll(
     "[data-reference-search-root]",
@@ -11,6 +70,7 @@
       (element) => ({
         element,
         text: normalize(element.getAttribute("data-search-item")),
+        parts: textParts(element),
       }),
     );
     const groups = Array.from(
@@ -29,6 +89,7 @@
       for (const item of items) {
         const matches = terms.every((term) => item.text.includes(term));
         item.element.hidden = !matches;
+        highlight(item.parts, matches ? terms : []);
         if (matches) count++;
       }
       for (const group of groups) {

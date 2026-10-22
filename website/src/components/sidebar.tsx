@@ -86,7 +86,7 @@ export default component$(
                             (props.baseHref || "../") + encodeURIComponent(entry.name.toLowerCase())
                           }
                         >
-                          {entry.name}
+                          <span>{entry.name}</span>
                         </a>
                       ))}
                     </>
@@ -100,7 +100,7 @@ export default component$(
                 value: "Registers: " + category,
                 trigger: <div class="font-semibold py-2 text-lg duration-150 rounded-md hover:bg-primary px-4 select-none">Registers: {category}</div>,
                 content: <>{registers.filter((r) => r.category === category).map((r) => (
-                  <a key={r.name} data-search-item={`${r.name} ${r.address} ${r.short} ${r.description} ${r.category}`} href={`${props.baseHref || "../"}registers/${r.name.toLowerCase()}/`} data-state={r.name === props.selectedEntry ? "selected" : ""} class="flex items-center rounded-sm text-base duration-150 hover:bg-primary p-1.5 pl-4 select-none data-[state=selected]:bg-secondary">{r.name}</a>
+                  <a key={r.name} data-search-item={`${r.name} ${r.address} ${r.short} ${r.description} ${r.category}`} href={`${props.baseHref || "../"}registers/${r.name.toLowerCase()}/`} data-state={r.name === props.selectedEntry ? "selected" : ""} class="flex items-center rounded-sm text-base duration-150 hover:bg-primary p-1.5 pl-4 select-none data-[state=selected]:bg-secondary"><span>{r.name}</span></a>
                 ))}</>,
               }))}
             />
@@ -109,7 +109,7 @@ export default component$(
               entries={[{
                 value: "Assembler Directives",
                 trigger: <div class="font-semibold py-2 text-lg duration-150 rounded-md hover:bg-primary px-4 select-none">Assembler Directives</div>,
-                content: <>{directives.map((d) => <a key={d.name} data-search-item={`${d.name} ${d.syntax} ${d.short} ${d.description}`} href={`${props.baseHref || "../"}directives/${d.slug}/`} data-state={d.name === props.selectedEntry ? "selected" : ""} class="flex items-center rounded-sm text-base duration-150 hover:bg-primary p-1.5 pl-4 select-none data-[state=selected]:bg-secondary">{d.name}</a>)}</>,
+                content: <>{directives.map((d) => <a key={d.name} data-search-item={`${d.name} ${d.syntax} ${d.short} ${d.description}`} href={`${props.baseHref || "../"}directives/${d.slug}/`} data-state={d.name === props.selectedEntry ? "selected" : ""} class="flex items-center rounded-sm text-base duration-150 hover:bg-primary p-1.5 pl-4 select-none data-[state=selected]:bg-secondary"><span>{d.name}</span></a>)}</>,
               }]}
             />
           </div>
