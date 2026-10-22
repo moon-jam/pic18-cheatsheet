@@ -169,7 +169,10 @@
     "related": [
       "DB",
       "DW",
-      "DS"
+      "DS",
+      "ORG",
+      "ALIGN",
+      "GLOBAL"
     ]
   },
   {
@@ -307,8 +310,10 @@
       }
     ],
     "related": [
+      "SET",
       "#define",
-      "DS"
+      "DS",
+      "IF"
     ]
   },
   {
@@ -348,7 +353,856 @@
     ],
     "related": [
       "EQU",
+      "MACRO",
+      "#include",
+      "#if",
+      "#undef",
       "DS"
+    ]
+  },
+  {
+    "name": "BANKSEL",
+    "slug": "banksel",
+    "syntax": "BANKSEL symbol",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Select the data bank for a variable",
+    "description": "Generates the instructions needed to select the data-memory bank containing symbol. On PIC18 this selects the Bank Select Register (BSR) value used by banked file-register instructions.",
+    "operands": [
+      {
+        "name": "symbol",
+        "description": "Data-memory symbol or full address whose bank must be selected."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "BANKSEL selects a bank; the following file-register instruction must still use banked access (a=1) and the bank-relative address. BANKMASK removes the bank bits from a full address.",
+      "Access Bank instructions (a=0) do not use BSR. BANKSEL emits executable code; it is not just a naming or placement directive."
+    ],
+    "example": "#include <xc.inc>\n\nPSECT udata_bank1\nsample: DS 1\n\nPSECT bankSelectCode,class=CODE,reloc=2\nstore_sample:\n    BANKSEL sample         ; PIC18: select bank 1 in BSR\n    MOVLW 0x2A\n    MOVWF BANKMASK(sample),1 ; sample = 0x2A using banked access\n    RETURN",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: BANKSEL",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-CEB4901C-F9A3-4138-81C9-C6B44FC643A0.html"
+      }
+    ],
+    "related": [
+      "PSECT",
+      "DS"
+    ]
+  },
+  {
+    "name": "CONFIG",
+    "slug": "config",
+    "syntax": "CONFIG setting = value",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Set device configuration bits",
+    "description": "Specifies configuration bits programmed into the device, such as oscillator mode, watchdog operation, and programming options. These settings are part of the programmed image, not instructions executed in sequence.",
+    "operands": [
+      {
+        "name": "setting",
+        "description": "Device-specific configuration setting, or a configuration register name."
+      },
+      {
+        "name": "value",
+        "description": "Named setting value; a register form takes a numeric literal."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "The example targets PIC18F4520. Names and available values depend on the selected device; check its configuration documentation.",
+      "ON and OFF are named choices, not a guarantee that the underlying bit value is 1 or 0. The oscillator setting must match the hardware."
+    ],
+    "example": "#include <xc.inc>\n\n; PIC18F4520 configuration choices:\nCONFIG OSC = INTIO67       ; internal oscillator; RA6/RA7 are port pins\nCONFIG WDT = OFF           ; watchdog disabled by configuration\nCONFIG LVP = OFF           ; low-voltage programming disabled\nCONFIG XINST = OFF         ; standard instruction set\n\nPSECT configCode,class=CODE,reloc=2\nidle:\n    BRA idle\n; CONFIG does not execute when the processor reaches this code.",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: CONFIG",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-80C3134D-0F98-47E9-A281-AE3AA03772F1.html"
+      }
+    ],
+    "related": [
+      "PSECT"
+    ]
+  },
+  {
+    "name": "ORG",
+    "slug": "org",
+    "syntax": "ORG offset",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Set the position within a section",
+    "description": "Moves the current section position forward to the specified offset from that section's base. In an abs,ovrld section, the base is zero, so the offset is an absolute address.",
+    "operands": [
+      {
+        "name": "offset",
+        "description": "Absolute value or expression referring to the current section; cannot move the current position backward."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "ORG alone does not fix the final address of a relocatable section. To place one at an absolute address, use a separate section and the linker placement option.",
+      "ORG skips positions; it does not itself emit instructions or initialize every skipped byte."
+    ],
+    "example": "#include <xc.inc>\n\nPSECT fixedTable,class=CONST,abs,ovrld\nORG 0x100\nfirst_byte:\n    DB 0x11                ; program address 0x100\nORG 0x104\nsecond_byte:\n    DB 0x22                ; program address 0x104",
+    "examples": [
+      {
+        "title": "Offset in a relocatable section",
+        "code": "#include <xc.inc>\n\nPSECT offsetData,class=CONST\nORG 0x10\nvalue_byte:\n    DB 0x33\n; If linked with -Wl,-PoffsetData=0x200,\n; value_byte is at 0x210, not 0x10."
+      }
+    ],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: ORG",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-812A2703-F016-456E-A1E5-27CFB52D5AAC.html"
+      }
+    ],
+    "related": [
+      "PSECT",
+      "ALIGN",
+      "DB"
+    ]
+  },
+  {
+    "name": "ALIGN",
+    "slug": "align",
+    "syntax": "ALIGN boundary",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Align the next item within a section",
+    "description": "Advances the position within the current section to the requested byte boundary. It can align the next object or make the section length a multiple of a boundary.",
+    "operands": [
+      {
+        "name": "boundary",
+        "description": "Alignment boundary in bytes, for example 2 or 4."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "Alignment is relative to the section base. Give the section a matching reloc alignment if the final absolute address must also be aligned."
+    ],
+    "example": "#include <xc.inc>\n\nPSECT alignedData,class=CONST,reloc=4\nfirst_byte:\n    DB 0x11\nALIGN 4\nnext_byte:\n    DB 0x22\n; next_byte is 4 bytes after first_byte.\n; reloc=4 also aligns the section base to a multiple of 4.",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: ALIGN",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-73FE3E1A-C26F-4D37-B406-09E095C645B7.html"
+      }
+    ],
+    "related": [
+      "PSECT",
+      "ORG",
+      "DB"
+    ]
+  },
+  {
+    "name": "GLOBAL",
+    "slug": "global",
+    "syntax": "GLOBAL symbol[,symbol...]",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Share symbols between source modules",
+    "description": "Makes symbols defined in this source module visible to other modules. For a symbol not defined here, GLOBAL instead declares a reference to a public symbol defined elsewhere.",
+    "operands": [
+      {
+        "name": "symbol",
+        "description": "Label or other symbol to export, or reference from another module."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "GLOBAL exports symbols; the PSECT global attribute controls section combination and does not export labels.",
+      "Save the examples as provider.S and caller.S and link both files. GLOBAL itself emits no executable code."
+    ],
+    "example": "; Save as provider.S\n#include <xc.inc>\nGLOBAL load_value\n\nPSECT providerCode,class=CODE,reloc=2\nload_value:\n    MOVLW 0x2A\n    RETURN",
+    "examples": [
+      {
+        "title": "caller.S",
+        "code": "; Save as caller.S\n#include <xc.inc>\nEXTRN load_value\nGLOBAL caller\n\nPSECT callerCode,class=CODE,reloc=2\ncaller:\n    CALL load_value        ; linker resolves the other file's label\n    RETURN                 ; WREG is 0x2A after the call\n; Assemble and link caller.S and provider.S together."
+      }
+    ],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: GLOBAL",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-A496B653-0EE5-46FB-ADD4-581C8282D0FD.html"
+      }
+    ],
+    "related": [
+      "EXTRN",
+      "PSECT"
+    ]
+  },
+  {
+    "name": "EXTRN",
+    "slug": "extrn",
+    "syntax": "EXTRN symbol[,symbol...]",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Reference symbols defined in another module",
+    "description": "Declares a reference to a public symbol defined in another source module. The linker resolves its address when the modules are linked.",
+    "operands": [
+      {
+        "name": "symbol",
+        "description": "External symbol exported by the defining module with GLOBAL."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "The spelling in pic-as is EXTRN. Defining the same symbol in this module is an error.",
+      "Save the examples as caller.S and provider.S and link both files; assembling only caller.S does not provide the missing definition."
+    ],
+    "example": "; Save as caller.S\n#include <xc.inc>\nEXTRN load_value\nGLOBAL caller\n\nPSECT callerCode,class=CODE,reloc=2\ncaller:\n    CALL load_value        ; linker resolves the other file's label\n    RETURN                 ; WREG is 0x2A after the call\n; Assemble and link caller.S and provider.S together.",
+    "examples": [
+      {
+        "title": "provider.S",
+        "code": "; Save as provider.S\n#include <xc.inc>\nGLOBAL load_value\n\nPSECT providerCode,class=CODE,reloc=2\nload_value:\n    MOVLW 0x2A\n    RETURN"
+      }
+    ],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: EXTRN",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-506A67F3-1F3A-4609-8662-2ED74E1BFB04.html"
+      }
+    ],
+    "related": [
+      "GLOBAL",
+      "PSECT"
+    ]
+  },
+  {
+    "name": "INCLUDE",
+    "slug": "include",
+    "syntax": "INCLUDE \"filename\"",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Read another file during assembly",
+    "description": "Reads the named file as assembly source at this location. Included definitions are available to the assembler as if they appeared here.",
+    "operands": [
+      {
+        "name": "filename",
+        "description": "Assembly include file; use an appropriate path when it is outside the working directory."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "INCLUDE runs in the assembler. #include runs earlier in the preprocessor; preprocessing directives in a file read only by INCLUDE will not go back through the preprocessor.",
+      "Save the second example as options.inc beside the first and assemble from that directory."
+    ],
+    "example": "#include <xc.inc>\nINCLUDE \"options.inc\"\n\nPSECT includeCode,class=CODE,reloc=2\nload_option:\n    MOVLW OPTION_VALUE     ; WREG = 0x2A\n    RETURN",
+    "examples": [
+      {
+        "title": "options.inc",
+        "code": "; Assembly definitions included by INCLUDE:\nOPTION_VALUE EQU 0x2A"
+      }
+    ],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: INCLUDE",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-1286EB79-F9C6-4AC7-905D-610A56AABBCD.html"
+      }
+    ],
+    "related": [
+      "#include",
+      "EQU"
+    ]
+  },
+  {
+    "name": "MACRO",
+    "slug": "macro",
+    "syntax": "name MACRO [parameter,...]",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Define a reusable block of assembly",
+    "description": "Defines a named template ending at ENDM. Invoking its name inserts a copy of the body with the supplied arguments substituted for the parameters.",
+    "operands": [
+      {
+        "name": "name",
+        "description": "Macro name, placed before MACRO."
+      },
+      {
+        "name": "parameter,...",
+        "description": "Optional comma-separated parameter names; supply matching arguments when invoking the macro."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "Each invocation emits a new copy of the body; it is not a subroutine call. Use LOCAL for labels inside a macro that can be expanded more than once.",
+      "Use #define for preprocessing text substitution. MACRO is expanded later by the assembler."
+    ],
+    "example": "#include <xc.inc>\n\nSTORE_BYTE MACRO destination,literal\n    MOVLW literal\n    MOVWF destination,0\nENDM\n\nPSECT macroCode,class=CODE,reloc=2\nstore_pair:\n    STORE_BYTE 0x20,0x2A  ; expands to MOVLW + MOVWF\n    STORE_BYTE 0x21,0x55  ; a second copy with other operands\n    RETURN\n; After execution: f[0x20] = 0x2A, f[0x21] = 0x55.",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: MACRO",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-F075D5AC-491F-42A7-B04C-2B0EB5B8734A.html"
+      }
+    ],
+    "related": [
+      "ENDM",
+      "LOCAL",
+      "#define",
+      "REPT"
+    ]
+  },
+  {
+    "name": "ENDM",
+    "slug": "endm",
+    "syntax": "ENDM",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "End a macro or repetition block",
+    "description": "Terminates the body of MACRO or REPT. It marks the end of an assembly-time block and does not generate a processor return instruction.",
+    "operands": [],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "ENDM pairs with MACRO or REPT. RETURN is a separate executable instruction used to return from a subroutine."
+    ],
+    "example": "#include <xc.inc>\n\nSTORE_BYTE MACRO destination,literal\n    MOVLW literal\n    MOVWF destination,0\nENDM\n\nPSECT macroCode,class=CODE,reloc=2\nstore_pair:\n    STORE_BYTE 0x20,0x2A  ; expands to MOVLW + MOVWF\n    STORE_BYTE 0x21,0x55  ; a second copy with other operands\n    RETURN\n; After execution: f[0x20] = 0x2A, f[0x21] = 0x55.",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: ENDM",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-F075D5AC-491F-42A7-B04C-2B0EB5B8734A.html"
+      }
+    ],
+    "related": [
+      "MACRO",
+      "REPT",
+      "LOCAL"
+    ]
+  },
+  {
+    "name": "LOCAL",
+    "slug": "local",
+    "syntax": "LOCAL symbol[,symbol...]",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Give each macro expansion unique labels",
+    "description": "Within a macro, declares symbols that receive distinct assembler-generated names for each expansion. This allows the same macro body to define a label more than once without a duplicate definition.",
+    "operands": [
+      {
+        "name": "symbol",
+        "description": "Macro-internal label or symbol that must be unique per expansion."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "LOCAL is an assembler directive for macro symbols. The PSECT local attribute instead separates same-name sections from different modules."
+    ],
+    "example": "#include <xc.inc>\n\nCOUNT_DOWN MACRO destination\n    LOCAL again\n    MOVLW 2\n    MOVWF destination,0\nagain:\n    DECFSZ destination,1,0\n    BRA again\nENDM\n\nPSECT localCode,class=CODE,reloc=2\nclear_pair:\n    COUNT_DOWN 0x20        ; unique instance of again\n    COUNT_DOWN 0x21        ; another instance; no duplicate label\n    RETURN\n; Each byte counts 2 -> 1 -> 0.",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: LOCAL",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-EA84D79C-7D9F-404B-A939-03A4C152E106.html"
+      }
+    ],
+    "related": [
+      "MACRO",
+      "ENDM",
+      "PSECT"
+    ]
+  },
+  {
+    "name": "REPT",
+    "slug": "rept",
+    "syntax": "REPT count",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Repeat a block during assembly",
+    "description": "Expands the block up to ENDM the specified number of times while assembling. The resulting program contains that many copies of its instructions or data.",
+    "operands": [
+      {
+        "name": "count",
+        "description": "Number of block expansions; provide an assembly-time constant."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "REPT does not generate a runtime loop or a loop counter. Use a branch instruction when repetition must be controlled during execution."
+    ],
+    "example": "#include <xc.inc>\n\nPSECT repeatCode,class=CODE,reloc=2\nadd_three:\n    MOVLW 0\n    REPT 3\n        ADDLW 1\n    ENDM\n    RETURN\n; The output contains three ADDLW 1 instructions.\n; Executing them changes WREG: 0 -> 1 -> 2 -> 3.",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: REPT",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-0FE0D2F0-57EF-4F69-8C5D-2EC760AD22E7.html"
+      }
+    ],
+    "related": [
+      "ENDM",
+      "MACRO",
+      "SET"
+    ]
+  },
+  {
+    "name": "SET",
+    "slug": "set",
+    "syntax": "symbol SET expression",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Define or redefine an assembler value",
+    "description": "Associates a symbol with a value during assembly and permits a later SET to change it. Unlike a variable, the symbol has no reserved storage or runtime value to update.",
+    "operands": [
+      {
+        "name": "symbol",
+        "description": "Assembler symbol, placed before SET."
+      },
+      {
+        "name": "expression",
+        "description": "Expression whose value is assigned at this point during assembly."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "EQU requires a new symbol; SET allows redefinition. DS reserves storage when a runtime variable is needed."
+    ],
+    "example": "#include <xc.inc>\n\nSTEP_VALUE SET 1\nPSECT setCode,class=CODE,reloc=2\nadd_values:\n    MOVLW STEP_VALUE      ; assembled as MOVLW 1\nSTEP_VALUE SET 2\n    ADDLW STEP_VALUE      ; assembled as ADDLW 2\n    RETURN                ; WREG = 3\n; SET itself creates no instruction and changes no data-memory byte.",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: SET",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-752DCEE8-F201-42FC-B558-720901056723.html"
+      }
+    ],
+    "related": [
+      "EQU",
+      "DS",
+      "REPT"
+    ]
+  },
+  {
+    "name": "IF",
+    "slug": "if",
+    "syntax": "IF expression",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Start conditional assembly",
+    "description": "Starts an assembly-time conditional block. A nonzero constant expression selects the following instructions for output; zero selects a later matching branch.",
+    "operands": [
+      {
+        "name": "expression",
+        "description": "Assembly-time constant expression; zero is false and nonzero is true."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "Conditions are evaluated during assembly, not during execution. Use processor tests and branches for runtime decisions.",
+      "The assembler still processes directives such as EQU in either branch. Define symbols outside this block; use preprocessor #if when whole source lines must be excluded before assembly.",
+      "Assembler equality uses = (or eq); preprocessor #if uses ==. ELSIF has no E after the S."
+    ],
+    "example": "#include <xc.inc>\nMODE_VALUE EQU 2\n\nPSECT conditionalCode,class=CODE,reloc=2\nload_mode:\n    IF MODE_VALUE = 2\n        MOVLW 0x22        ; only this MOVLW is emitted\n    ELSE\n        MOVLW 0x33\n    ENDIF\n    RETURN\n; Executing the selected code puts 0x22 in WREG.",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: IF",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-FB915E2C-C20C-46A9-BC35-A351887C11C0.html"
+      }
+    ],
+    "related": [
+      "ELSIF",
+      "ELSE",
+      "ENDIF",
+      "#if"
+    ]
+  },
+  {
+    "name": "ELSIF",
+    "slug": "elsif",
+    "syntax": "ELSIF expression",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Test another assembly condition",
+    "description": "Adds another condition to an IF block. Its instructions are emitted only when no preceding branch was selected and this condition is nonzero.",
+    "operands": [
+      {
+        "name": "expression",
+        "description": "Additional assembly-time constant expression."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "Conditions are evaluated during assembly, not during execution. Use processor tests and branches for runtime decisions.",
+      "The assembler still processes directives such as EQU in either branch. Define symbols outside this block; use preprocessor #if when whole source lines must be excluded before assembly.",
+      "Assembler equality uses = (or eq); preprocessor #if uses ==. ELSIF has no E after the S.",
+      "pic-as treats ELSIF as a nested ELSE + IF. Close the extra condition with another ENDIF, as shown in the guide's example and verified with XC8 v4.00."
+    ],
+    "example": "#include <xc.inc>\nMODE_VALUE EQU 2\n\nPSECT conditionalCode,class=CODE,reloc=2\nload_mode:\n    IF MODE_VALUE = 1\n        MOVLW 0x11\n    ELSIF MODE_VALUE = 2\n        MOVLW 0x22        ; only this MOVLW is emitted\n    ELSE\n        MOVLW 0x33\n    ENDIF                 ; close the IF introduced by ELSIF\n    ENDIF                 ; close the original IF\n    RETURN\n; Executing the selected code puts 0x22 in WREG.",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: ELSIF",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-FB915E2C-C20C-46A9-BC35-A351887C11C0.html"
+      }
+    ],
+    "related": [
+      "IF",
+      "ELSE",
+      "ENDIF",
+      "#if"
+    ]
+  },
+  {
+    "name": "ELSE",
+    "slug": "else",
+    "syntax": "ELSE",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Select the remaining assembly case",
+    "description": "Adds a fallback branch to an IF block. Its instructions are emitted when no preceding IF or ELSIF branch was selected.",
+    "operands": [],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "Conditions are evaluated during assembly, not during execution. Use processor tests and branches for runtime decisions.",
+      "The assembler still processes directives such as EQU in either branch. Define symbols outside this block; use preprocessor #if when whole source lines must be excluded before assembly.",
+      "Assembler equality uses = (or eq); preprocessor #if uses ==. ELSIF has no E after the S."
+    ],
+    "example": "#include <xc.inc>\nMODE_VALUE EQU 2\n\nPSECT conditionalCode,class=CODE,reloc=2\nload_mode:\n    IF MODE_VALUE = 2\n        MOVLW 0x22        ; only this MOVLW is emitted\n    ELSE\n        MOVLW 0x33\n    ENDIF\n    RETURN\n; Executing the selected code puts 0x22 in WREG.",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: ELSE",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-FB915E2C-C20C-46A9-BC35-A351887C11C0.html"
+      }
+    ],
+    "related": [
+      "IF",
+      "ELSIF",
+      "ENDIF",
+      "#if"
+    ]
+  },
+  {
+    "name": "ENDIF",
+    "slug": "endif",
+    "syntax": "ENDIF",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "End conditional assembly",
+    "description": "Closes the matching IF block. Subsequent instructions are outside that conditional block.",
+    "operands": [],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "Conditions are evaluated during assembly, not during execution. Use processor tests and branches for runtime decisions.",
+      "The assembler still processes directives such as EQU in either branch. Define symbols outside this block; use preprocessor #if when whole source lines must be excluded before assembly.",
+      "Assembler equality uses = (or eq); preprocessor #if uses ==. ELSIF has no E after the S."
+    ],
+    "example": "#include <xc.inc>\nMODE_VALUE EQU 2\n\nPSECT conditionalCode,class=CODE,reloc=2\nload_mode:\n    IF MODE_VALUE = 2\n        MOVLW 0x22        ; only this MOVLW is emitted\n    ELSE\n        MOVLW 0x33\n    ENDIF\n    RETURN\n; Executing the selected code puts 0x22 in WREG.",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: ENDIF",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-FB915E2C-C20C-46A9-BC35-A351887C11C0.html"
+      }
+    ],
+    "related": [
+      "IF",
+      "ELSIF",
+      "ELSE",
+      "#if"
+    ]
+  },
+  {
+    "name": "END",
+    "slug": "end",
+    "syntax": "END [entry_label]",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Finish the assembly source",
+    "description": "Ends assembly of the source file. An optional expression records an entry point in the object file; whether the linker uses it depends on the build.",
+    "operands": [
+      {
+        "name": "entry_label",
+        "description": "Optional entry-point expression recorded in the object file."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "END is optional. If present, put it at the end of the source with nothing following.",
+      "END does not halt the processor and does not set the PIC18 reset vector. Use an executable loop for a running program that must remain in place, and place reset code separately."
+    ],
+    "example": "#include <xc.inc>\n\nPSECT endCode,class=CODE,reloc=2\nidle:\n    BRA idle              ; executable loop keeps the processor here\nEND idle                  ; assembler source ends here",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: END",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-AE600134-206C-418E-8E4D-86958D84D72D.html"
+      }
+    ],
+    "related": [
+      "PSECT",
+      "ORG"
+    ]
+  },
+  {
+    "name": "#include",
+    "slug": "cpp-include",
+    "syntax": "#include \"filename\"",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Read a file before assembly",
+    "description": "Inserts a file during preprocessing. Both its preprocessor directives and its assembly contents are then available to the rest of the source.",
+    "operands": [
+      {
+        "name": "filename",
+        "description": "Use quotes for a project file, or angle brackets for a header such as <xc.inc>."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "Use a .S source filename (uppercase S), or -xassembler-with-cpp, to enable preprocessing.",
+      "Save the second example as project.inc beside the source. The include guard prevents repeated inclusion from defining its contents again."
+    ],
+    "example": "#include <xc.inc>\n#include \"project.inc\"\n#include \"project.inc\"    // the guard skips this second copy\n\nPSECT preIncludeCode,class=CODE,reloc=2\nload_project_value:\n    MOVLW PROJECT_VALUE   ; WREG = 0x2A\n    RETURN",
+    "examples": [
+      {
+        "title": "project.inc",
+        "code": "#ifndef PROJECT_INC\n#define PROJECT_INC\n#define PROJECT_VALUE 0x2A\n#endif"
+      }
+    ],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: Preprocessor Directives",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-3F9A9267-BEDE-455C-A3E9-8B3E2B666177.html"
+      }
+    ],
+    "related": [
+      "INCLUDE",
+      "#ifndef",
+      "#define"
+    ]
+  },
+  {
+    "name": "#if",
+    "slug": "cpp-if",
+    "syntax": "#if expression",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Select source by a preprocessing condition",
+    "description": "Before assembly, includes source lines when the preprocessor expression is nonzero and excludes them when it is zero.",
+    "operands": [
+      {
+        "name": "expression",
+        "description": "Preprocessor expression using macros such as those defined with #define. Equality uses ==."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "Use a .S source filename (uppercase S), or -xassembler-with-cpp, to enable preprocessing.",
+      "Preprocessing happens before assembler symbols such as EQU are evaluated. Use #define for these conditions, or use assembler IF to test assembler constants."
+    ],
+    "example": "#include <xc.inc>\n#define MODE_VALUE 2\n\nPSECT preConditionalCode,class=CODE,reloc=2\nload_mode:\n#if MODE_VALUE == 1\n    MOVLW 0x11\n#elif MODE_VALUE == 2\n    MOVLW 0x22            ; only this source branch reaches assembly\n#else\n    MOVLW 0x33\n#endif\n    RETURN                ; WREG = 0x22",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: Preprocessor Directives",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-3F9A9267-BEDE-455C-A3E9-8B3E2B666177.html"
+      }
+    ],
+    "related": [
+      "#elif",
+      "#else",
+      "#endif",
+      "#ifdef",
+      "IF"
+    ]
+  },
+  {
+    "name": "#elif",
+    "slug": "cpp-elif",
+    "syntax": "#elif expression",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Test another preprocessing condition",
+    "description": "Adds an alternative condition to a preprocessor conditional block. This branch is included only if no earlier branch was selected and its expression is nonzero.",
+    "operands": [
+      {
+        "name": "expression",
+        "description": "Additional preprocessor expression."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "Use a .S source filename (uppercase S), or -xassembler-with-cpp, to enable preprocessing.",
+      "Preprocessing happens before assembler symbols such as EQU are evaluated. Use #define for these conditions, or use assembler IF to test assembler constants."
+    ],
+    "example": "#include <xc.inc>\n#define MODE_VALUE 2\n\nPSECT preConditionalCode,class=CODE,reloc=2\nload_mode:\n#if MODE_VALUE == 1\n    MOVLW 0x11\n#elif MODE_VALUE == 2\n    MOVLW 0x22            ; only this source branch reaches assembly\n#else\n    MOVLW 0x33\n#endif\n    RETURN                ; WREG = 0x22",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: Preprocessor Directives",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-3F9A9267-BEDE-455C-A3E9-8B3E2B666177.html"
+      }
+    ],
+    "related": [
+      "#if",
+      "#else",
+      "#endif",
+      "#ifdef",
+      "IF"
+    ]
+  },
+  {
+    "name": "#else",
+    "slug": "cpp-else",
+    "syntax": "#else",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Select the remaining source branch",
+    "description": "Includes the fallback branch when no earlier branch of the matching preprocessor conditional was selected.",
+    "operands": [],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "Use a .S source filename (uppercase S), or -xassembler-with-cpp, to enable preprocessing.",
+      "Preprocessing happens before assembler symbols such as EQU are evaluated. Use #define for these conditions, or use assembler IF to test assembler constants."
+    ],
+    "example": "#include <xc.inc>\n#define MODE_VALUE 2\n\nPSECT preConditionalCode,class=CODE,reloc=2\nload_mode:\n#if MODE_VALUE == 1\n    MOVLW 0x11\n#elif MODE_VALUE == 2\n    MOVLW 0x22            ; only this source branch reaches assembly\n#else\n    MOVLW 0x33\n#endif\n    RETURN                ; WREG = 0x22",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: Preprocessor Directives",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-3F9A9267-BEDE-455C-A3E9-8B3E2B666177.html"
+      }
+    ],
+    "related": [
+      "#if",
+      "#elif",
+      "#endif",
+      "#ifdef",
+      "IF"
+    ]
+  },
+  {
+    "name": "#endif",
+    "slug": "cpp-endif",
+    "syntax": "#endif",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "End a preprocessing conditional",
+    "description": "Ends the matching #if, #ifdef, or #ifndef block. Source after it is outside that conditional.",
+    "operands": [],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "Use a .S source filename (uppercase S), or -xassembler-with-cpp, to enable preprocessing.",
+      "Preprocessing happens before assembler symbols such as EQU are evaluated. Use #define for these conditions, or use assembler IF to test assembler constants."
+    ],
+    "example": "#include <xc.inc>\n#define MODE_VALUE 2\n\nPSECT preConditionalCode,class=CODE,reloc=2\nload_mode:\n#if MODE_VALUE == 1\n    MOVLW 0x11\n#elif MODE_VALUE == 2\n    MOVLW 0x22            ; only this source branch reaches assembly\n#else\n    MOVLW 0x33\n#endif\n    RETURN                ; WREG = 0x22",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: Preprocessor Directives",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-3F9A9267-BEDE-455C-A3E9-8B3E2B666177.html"
+      }
+    ],
+    "related": [
+      "#if",
+      "#elif",
+      "#else",
+      "#ifdef",
+      "IF"
+    ]
+  },
+  {
+    "name": "#ifdef",
+    "slug": "cpp-ifdef",
+    "syntax": "#ifdef name",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Include source if a macro exists",
+    "description": "Includes source lines when the named preprocessor macro is defined. It tests existence, not the numeric value of its replacement text.",
+    "operands": [
+      {
+        "name": "name",
+        "description": "Preprocessor macro name, without parentheses."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "Use a .S source filename (uppercase S), or -xassembler-with-cpp, to enable preprocessing.",
+      "A macro defined as 0 still satisfies #ifdef. Use #if when the replacement value should be tested."
+    ],
+    "example": "#include <xc.inc>\n#define FEATURE_VALUE 0\n\nPSECT ifdefCode,class=CODE,reloc=2\nload_feature:\n#ifdef FEATURE_VALUE\n    MOVLW 0x2A            ; selected: FEATURE_VALUE exists, even as 0\n#else\n    MOVLW 0x00\n#endif\n    RETURN",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: Preprocessor Directives",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-3F9A9267-BEDE-455C-A3E9-8B3E2B666177.html"
+      }
+    ],
+    "related": [
+      "#define",
+      "#if",
+      "#ifndef",
+      "#endif"
+    ]
+  },
+  {
+    "name": "#ifndef",
+    "slug": "cpp-ifndef",
+    "syntax": "#ifndef name",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Include source if a macro is absent",
+    "description": "Includes source lines when the named preprocessor macro is not defined. Useful for default values and include guards that prevent repeated definitions.",
+    "operands": [
+      {
+        "name": "name",
+        "description": "Preprocessor macro name whose absence should be tested."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "Use a .S source filename (uppercase S), or -xassembler-with-cpp, to enable preprocessing.",
+      "A default guarded with #ifndef preserves a definition already supplied by the project or the command line."
+    ],
+    "example": "#include <xc.inc>\n#ifndef BUFFER_SIZE\n#define BUFFER_SIZE 4\n#endif\n\nPSECT ifndefCode,class=CODE,reloc=2\nload_buffer_size:\n    MOVLW BUFFER_SIZE     ; WREG = 4 when no override is provided\n    RETURN\n; Building with -DBUFFER_SIZE=8 instead emits MOVLW 8.",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: Preprocessor Directives",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-3F9A9267-BEDE-455C-A3E9-8B3E2B666177.html"
+      }
+    ],
+    "related": [
+      "#define",
+      "#ifdef",
+      "#include",
+      "#endif"
+    ]
+  },
+  {
+    "name": "#undef",
+    "slug": "cpp-undef",
+    "syntax": "#undef name",
+    "assembler": "MPLAB XC8 PIC Assembler (pic-as)",
+    "short": "Remove a preprocessor macro",
+    "description": "Removes the definition of the named macro for subsequent preprocessing. It emits no code and does not change symbols created by assembler EQU or SET.",
+    "operands": [
+      {
+        "name": "name",
+        "description": "Macro name to undefine."
+      }
+    ],
+    "flags": [],
+    "tables": [],
+    "notes": [
+      "Use a .S source filename (uppercase S), or -xassembler-with-cpp, to enable preprocessing."
+    ],
+    "example": "#include <xc.inc>\n#define FEATURE_VALUE 1\n#undef FEATURE_VALUE\n\nPSECT undefCode,class=CODE,reloc=2\nload_without_feature:\n#ifdef FEATURE_VALUE\n    MOVLW 0x11\n#else\n    MOVLW 0x22            ; selected: the macro was removed\n#endif\n    RETURN",
+    "examples": [],
+    "sources": [
+      {
+        "title": "PIC Assembler User's Guide: Preprocessor Directives",
+        "url": "https://onlinedocs.microchip.com/oxy/GUID-4DC87671-9D8E-428A-ADFE-98D694F9F089-en-US-7/GUID-3F9A9267-BEDE-455C-A3E9-8B3E2B666177.html"
+      }
+    ],
+    "related": [
+      "#define",
+      "#ifdef",
+      "EQU",
+      "SET"
     ]
   }
 ]

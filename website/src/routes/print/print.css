@@ -166,8 +166,9 @@
   .print-index section {
     margin-top: 5mm;
   }
-  .print-index #directives {
+  .print-index .directive-intro {
     break-inside: avoid;
+    break-after: avoid;
   }
   .print-index .leading-6 {
     line-height: 1.45;
