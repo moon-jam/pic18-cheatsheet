@@ -4,6 +4,7 @@ import instructions from "../../../data/reference.json";
 import { LuStar, LuTerminal } from "@qwikest/icons/lucide";
 import RegisterList from "./register-list";
 import DirectiveList from "./directive-list";
+import ReferenceSearch from "./reference-search";
 
 import { entryId, indexId } from "./reference-links";
 
@@ -21,6 +22,7 @@ export default component$((props: { printView?: boolean }) => {
 
   return (
     <div
+      data-reference-search-root={props.printView ? undefined : "index"}
       class={
         props.printView
           ? "print-index"
@@ -47,7 +49,8 @@ export default component$((props: { printView?: boolean }) => {
             </a>
           )}
         </nav>
-        <div class="rounded-lg border border-outline p-3 text-sm leading-6">
+        {!props.printView && <ReferenceSearch />}
+        <div data-search-intro class="rounded-lg border border-outline p-3 text-sm leading-6">
           <h2 class="font-semibold mb-2">Operand guide</h2>
           <table class="w-full text-left">
             <tbody>
@@ -141,7 +144,7 @@ export default component$((props: { printView?: boolean }) => {
         </div>
         <div id="instructions" />
         {Object.entries(grouped).map(([category, items]) => (
-          <section key={category}>
+          <section key={category} data-search-group>
             <h2 class="text-2xl font-bold mb-4 border-b border-outline pb-2 select-none flex justify-start items-center">
               <LuTerminal class="h-7 w-7 inline-block -mb-1 mr-3" />
               {category}
@@ -166,6 +169,7 @@ export default component$((props: { printView?: boolean }) => {
               <div class="text-md grid grid-cols-1 md:grid-cols-2 gap-y-0.5 gap-x-3">
                 {items.map((item, index) => (
                   <a
+                    data-search-item={`${item.name} ${item.syntax} ${item.short} ${item.description} ${item.category}`}
                     id={
                       props.printView
                         ? indexId("instruction", item.name)

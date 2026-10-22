@@ -10,6 +10,7 @@ import registers from "../../../data/registers.json";
 import directives from "../../../data/directives.json";
 import Button from "./ui/button";
 import { Accordion } from "./ui/accordion";
+import ReferenceSearch from "./reference-search";
 
 type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -47,6 +48,7 @@ export default component$(
           <LuArrowRight class="w-6 h-6" />
         </Button>
         <div
+          data-reference-search-root="sidebar"
           class={`bg-sidebar-bg border-outline border-r p-5 flex flex-col transition-all peer-not-checked:-ml-[100vw] w-screen md:peer-not-checked:-ml-[310px] md:w-[310px] ${props["class"]}`}
         >
           <div class="flex items-center justify-between text-lg font-semibold border-b border-outline pb-1 mb-2 items-center">
@@ -58,7 +60,8 @@ export default component$(
               <LuArrowLeft class="w-6 h-6" />
             </Button>
           </div>
-          <div class="space-y-1 grow overflow-y-auto nobar">
+          <ReferenceSearch compact />
+          <div data-search-list class="space-y-1 grow overflow-y-auto nobar">
             <Accordion
               value={props.selectedCategory || null}
               entries={Object.entries(categories).map(
@@ -73,6 +76,7 @@ export default component$(
                     <>
                       {entries.map((entry: Entry) => (
                         <a
+                          data-search-item={`${entry.name} ${entry.syntax} ${entry.short} ${entry.description} ${entry.category}`}
                           class="flex items-center rounded-sm text-base duration-150 hover:bg-primary p-1.5 pl-4 select-none data-[state=selected]:bg-secondary"
                           key={entry.name}
                           data-state={
@@ -96,7 +100,7 @@ export default component$(
                 value: "Registers: " + category,
                 trigger: <div class="font-semibold py-2 text-lg duration-150 rounded-md hover:bg-primary px-4 select-none">Registers: {category}</div>,
                 content: <>{registers.filter((r) => r.category === category).map((r) => (
-                  <a key={r.name} href={`${props.baseHref || "../"}registers/${r.name.toLowerCase()}/`} data-state={r.name === props.selectedEntry ? "selected" : ""} class="flex items-center rounded-sm text-base duration-150 hover:bg-primary p-1.5 pl-4 select-none data-[state=selected]:bg-secondary">{r.name}</a>
+                  <a key={r.name} data-search-item={`${r.name} ${r.address} ${r.short} ${r.description} ${r.category}`} href={`${props.baseHref || "../"}registers/${r.name.toLowerCase()}/`} data-state={r.name === props.selectedEntry ? "selected" : ""} class="flex items-center rounded-sm text-base duration-150 hover:bg-primary p-1.5 pl-4 select-none data-[state=selected]:bg-secondary">{r.name}</a>
                 ))}</>,
               }))}
             />
@@ -105,7 +109,7 @@ export default component$(
               entries={[{
                 value: "Assembler Directives",
                 trigger: <div class="font-semibold py-2 text-lg duration-150 rounded-md hover:bg-primary px-4 select-none">Assembler Directives</div>,
-                content: <>{directives.map((d) => <a key={d.name} href={`${props.baseHref || "../"}directives/${d.slug}/`} data-state={d.name === props.selectedEntry ? "selected" : ""} class="flex items-center rounded-sm text-base duration-150 hover:bg-primary p-1.5 pl-4 select-none data-[state=selected]:bg-secondary">{d.name}</a>)}</>,
+                content: <>{directives.map((d) => <a key={d.name} data-search-item={`${d.name} ${d.syntax} ${d.short} ${d.description}`} href={`${props.baseHref || "../"}directives/${d.slug}/`} data-state={d.name === props.selectedEntry ? "selected" : ""} class="flex items-center rounded-sm text-base duration-150 hover:bg-primary p-1.5 pl-4 select-none data-[state=selected]:bg-secondary">{d.name}</a>)}</>,
               }]}
             />
           </div>

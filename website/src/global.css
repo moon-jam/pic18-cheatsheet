@@ -107,3 +107,27 @@
 ul {
   margin: 0;
 }
+
+[data-search-item][hidden],
+[data-search-group][hidden],
+[data-search-intro][hidden] {
+  display: none !important;
+}
+
+[data-search-active] .accordion__content {
+  max-height: none;
+  overflow: visible;
+}
+
+[data-search-active] .accordion__empty_header {
+  display: none !important;
+}
+
+[data-search-active] .accordion__header {
+  display: block !important;
+  pointer-events: none;
+}
+
+@media print {
+  [data-search-controls] { display: none !important; }
+}

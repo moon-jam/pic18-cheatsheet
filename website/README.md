@@ -103,3 +103,13 @@ Print styles use a white background, page numbers, wrapped examples, and repeate
 table headers. A4 is the default; Letter can be selected in the print dialog.
 Use the default scale and turn off the browser's headers and footers. External
 Microchip source links still require an internet connection.
+
+## Search
+
+Search on the homepage or in the sidebar filters names, operands, addresses,
+and descriptions immediately. Multiple words must all match. Clear the field or
+press Escape to restore the full list. Search uses the entries already in the
+page and works offline with the complete static build.
+
+After building and purifying, run `pnpm test:reference` to check the published
+search enhancement, matching behavior, and complete print view.

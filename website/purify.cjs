@@ -46,9 +46,14 @@ function sanitizeFile(filePath) {
     const dom = new JSDOM(htmlContent);
     const document = dom.window.document;
 
-    // Find and remove all <script> tags
+    // Keep only the local search enhancement; remove framework runtime scripts.
     const scripts = document.querySelectorAll('script');
-    scripts.forEach(script => script.remove());
+    scripts.forEach(script => {
+      const src = script.getAttribute('src') || '';
+      const isSearch = script.hasAttribute('data-reference-search') &&
+        /^\/assets\/[\w-]+-reference-search-runtime\.js$/.test(src);
+      if (!isSearch) script.remove();
+    });
 
     // Remove all HTML comments recursively from the entire document
     removeComments(document);

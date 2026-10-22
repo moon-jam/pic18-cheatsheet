@@ -24,7 +24,7 @@ export const Accordion = component$<AccordionProps>((props) => {
             name="accordion"
             class="accordion__input"
           />
-          <div key={entry.value}>
+          <div key={entry.value} data-search-group>
             <input
               type="radio"
               id={entry.value}

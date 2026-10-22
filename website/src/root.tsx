@@ -1,6 +1,7 @@
 import { component$, isDev } from "@builder.io/qwik";
 import { QwikCityProvider, RouterOutlet } from "@builder.io/qwik-city";
 import { RouterHead } from "./components/router-head/router-head";
+import referenceSearch from "./components/reference-search-runtime.js?url&no-inline";
 
 import "./global.css";
 
@@ -26,6 +27,7 @@ export default component$(() => {
       </head>
       <body lang="en" class="overflow-x-hidden text-text bg-chat-bg">
         <RouterOutlet />
+        <script src={referenceSearch} defer data-reference-search />
       </body>
     </QwikCityProvider>
   );
