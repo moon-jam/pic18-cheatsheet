@@ -54,6 +54,68 @@
         filter();
       }
     });
+
+    if (root.getAttribute("data-reference-search-root") === "index") {
+      const storageKey = "pic18:index-view";
+      const indexPath = location.pathname.replace(/index\.html$/, "");
+      const saveView = () => {
+        try {
+          sessionStorage.setItem(
+            storageKey,
+            JSON.stringify({
+              path: indexPath,
+              query: input.value,
+              scroll: root.scrollTop,
+            }),
+          );
+        } catch {
+          // Search and ordinary navigation still work if storage is unavailable.
+        }
+      };
+      const restoreView = (event) => {
+        const navigation = performance.getEntriesByType?.("navigation")?.[0];
+        // Explicit section links keep their intended target; Back restores the view.
+        if (
+          location.hash &&
+          !event?.persisted &&
+          navigation?.type !== "back_forward"
+        )
+          return;
+        try {
+          const saved = JSON.parse(sessionStorage.getItem(storageKey));
+          if (
+            saved?.path !== indexPath ||
+            typeof saved.query !== "string" ||
+            !Number.isFinite(saved.scroll) ||
+            saved.scroll < 0
+          )
+            return;
+          input.value = saved.query;
+          filter();
+          root.scrollTop = saved.scroll;
+        } catch {
+          // Ignore absent, malformed, or inaccessible session data.
+        }
+      };
+      root.addEventListener("click", (event) => {
+        const link = event.target.closest?.("a[href]");
+        if (!link) return;
+        const target = new URL(link.href, location.href);
+        if (
+          target.pathname === location.pathname &&
+          target.hash &&
+          input.value
+        ) {
+          input.value = "";
+          filter();
+        }
+        saveView();
+      });
+      root.addEventListener("auxclick", saveView);
+      window.addEventListener("pagehide", saveView);
+      window.addEventListener("pageshow", restoreView);
+      restoreView();
+    }
     root.querySelector("[data-search-controls]").hidden = false;
   }
 })();

@@ -9,8 +9,9 @@ const directives = require('../../data/directives.json');
 const total = require('../../data/reference.json').length +
   require('../../data/registers.json').length + directives.length;
 
-function load(route = '/') {
-  const html = fs.readFileSync(path.join(dist, route, 'index.html'), 'utf8');
+function load(route = '/', options = {}) {
+  const url = new URL(route, 'http://localhost');
+  const html = fs.readFileSync(path.join(dist, url.pathname, 'index.html'), 'utf8');
   const dom = new JSDOM(html, { url: `http://localhost${route}`, runScripts: 'outside-only' });
   const scripts = dom.window.document.querySelectorAll('script');
   assert.equal(scripts.length, 1, 'purified pages retain only the search enhancement');
@@ -18,6 +19,9 @@ function load(route = '/') {
   const src = scripts[0].getAttribute('src');
   assert.match(src, /^\/assets\/[\w-]+-reference-search-runtime\.js$/);
   dom.window.fetch = () => { throw new Error('search must not request data'); };
+  if (options.saved) dom.window.sessionStorage.setItem('pic18:index-view', options.saved);
+  if (options.navigationType) dom.window.performance.getEntriesByType = () => [{ type: options.navigationType }];
+  if (options.blockStorage) Object.defineProperty(dom.window, 'sessionStorage', { get() { throw new Error('storage blocked'); } });
   dom.window.eval(fs.readFileSync(path.join(dist, src), 'utf8'));
   return dom;
 }
@@ -87,5 +91,62 @@ test('complete print reference is unfiltered and contains every directive', () =
   assert.equal(doc.querySelector('[data-reference-search-root]'), null);
   assert.equal(doc.querySelectorAll('.print-entry').length, total);
   assert.equal(doc.querySelectorAll('.print-entry[hidden]').length, 0);
+  dom.window.close();
+});
+
+test('leaving the index saves the view; a homepage visit restores search and scroll', () => {
+  const dom = load();
+  const root = dom.window.document.querySelector('[data-reference-search-root]');
+  const matches = query(dom, 'branch');
+  root.scrollTop = 420;
+  dom.window.document.addEventListener('click', event => event.preventDefault());
+  matches[0].dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }));
+  const saved = dom.window.sessionStorage.getItem('pic18:index-view');
+  assert.equal(JSON.parse(saved).scroll, 420);
+  assert.equal(JSON.parse(saved).query, 'branch');
+  const returned = load('/', { saved });
+  assert.equal(returned.window.document.querySelector('[data-search-input]').value, 'branch');
+  assert.equal(returned.window.document.querySelector('[data-reference-search-root]').scrollTop, 420);
+  assert.equal(returned.window.document.querySelectorAll('[data-search-item]:not([hidden])').length, matches.length);
+  dom.window.close(); returned.window.close();
+});
+
+test('Back restores a view with a fragment while fresh section links retain their target', () => {
+  const saved = JSON.stringify({ path: '/', query: 'ADDLW', scroll: 150 });
+  const fresh = load('/#registers', { saved });
+  assert.equal(fresh.window.document.querySelector('[data-search-input]').value, '');
+  const back = load('/#registers', { saved, navigationType: 'back_forward' });
+  assert.equal(back.window.document.querySelector('[data-search-input]').value, 'ADDLW');
+  assert.equal(back.window.document.querySelector('[data-reference-search-root]').scrollTop, 150);
+  const cached = load('/#registers', { saved });
+  cached.window.dispatchEvent(new cached.window.PageTransitionEvent('pageshow', { persisted: true }));
+  assert.equal(cached.window.document.querySelector('[data-search-input]').value, 'ADDLW');
+  fresh.window.close(); back.window.close(); cached.window.close();
+});
+
+test('pagehide saves an unfiltered position and section navigation clears hidden results', () => {
+  const dom = load();
+  const doc = dom.window.document;
+  const root = doc.querySelector('[data-reference-search-root]');
+  root.scrollTop = 1600;
+  dom.window.dispatchEvent(new dom.window.PageTransitionEvent('pagehide'));
+  assert.equal(JSON.parse(dom.window.sessionStorage.getItem('pic18:index-view')).scroll, 1600);
+  query(dom, 'ADDLW');
+  doc.addEventListener('click', event => event.preventDefault());
+  doc.querySelector('nav a[href="#registers"]').dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }));
+  assert.equal(doc.querySelector('[data-search-input]').value, '');
+  assert.equal(doc.getElementById('registers').hidden, false);
+  dom.window.close();
+});
+
+test('bad or unavailable storage cannot break search; detail sidebars do not inherit the home filter', () => {
+  for (const options of [{ saved: 'not JSON' }, { saved: JSON.stringify({ path: '/', query: 5, scroll: -1 }) }, { blockStorage: true }]) {
+    const dom = load('/', options);
+    assert.equal(query(dom, 'ADDLW').length, 1);
+    dom.window.close();
+  }
+  const dom = load('/registers/status/', { saved: JSON.stringify({ path: '/', query: 'ADDLW', scroll: 150 }) });
+  assert.equal(dom.window.document.querySelector('[data-search-input]').value, '');
+  assert.equal(dom.window.document.querySelectorAll('[data-search-item]:not([hidden])').length, total);
   dom.window.close();
 });

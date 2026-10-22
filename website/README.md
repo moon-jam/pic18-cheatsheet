@@ -111,5 +111,9 @@ and descriptions immediately. Multiple words must all match. Clear the field or
 press Escape to restore the full list. Search uses the entries already in the
 page and works offline with the complete static build.
 
+The homepage remembers its search and scroll position for the current browser
+tab. Returning through the homepage link or the browser's Back button restores
+that view. Explicit links to a homepage section still jump to that section.
+
 After building and purifying, run `pnpm test:reference` to check the published
 search enhancement, matching behavior, and complete print view.
